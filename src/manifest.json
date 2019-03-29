@@ -1,8 +1,8 @@
 {
 
-    "name": "Emby",
-    "_comment": "This should be Jellyfin, but that breaks apps...",
-    "description": "Jellyfin: the Free Software Media System.",
+    "name": "NeexTV",
+    "_comment": "The ultimate TV and Media Center",
+    "description": "The ultimate TV and Media Center",
     "lang": "en-US",
     "display": "minimal-ui",
     "short_name": "Emby",
@@ -24,7 +24,11 @@
             "type": "image/png"
         }
     ],
-    "related_applications": [{
-        "platform": "web"
-    }]
+    "related_applications": [
+        {
+            "url": "https://neex.tv",
+            "id": "com.neextv.web",
+            "platform": "web"
+        }
+    ]
 }

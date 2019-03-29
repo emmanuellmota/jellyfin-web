@@ -20,8 +20,8 @@ define(["appSettings", "dom", "connectionManager", "loading", "cardStyle", "emby
         })
     }
 
-    function showManualForm(context, showCancel, focusPassword) {
-        context.querySelector(".chkRememberLogin").checked = appSettings.enableAutoLogin(), context.querySelector(".manualLoginForm").classList.remove("hide"), context.querySelector(".visualLoginForm").classList.add("hide"), focusPassword ? context.querySelector("#txtManualPassword").focus() : context.querySelector("#txtManualName").focus(), showCancel ? context.querySelector(".btnCancel").classList.remove("hide") : context.querySelector(".btnCancel").classList.add("hide")
+    function showManualForm(context, focusPassword) {
+        context.querySelector(".chkRememberLogin").checked = appSettings.enableAutoLogin(), context.querySelector(".manualLoginForm").classList.remove("hide"), context.querySelector(".visualLoginForm").classList.add("hide"), focusPassword ? context.querySelector("#txtManualPassword").focus() : context.querySelector("#txtManualName").focus()
     }
 
     function getRandomMetroColor() {
@@ -74,7 +74,7 @@ define(["appSettings", "dom", "connectionManager", "loading", "cardStyle", "emby
                     id = cardContent.getAttribute("data-userid"),
                     name = cardContent.getAttribute("data-username"),
                     haspw = cardContent.getAttribute("data-haspw");
-                "manual" == id ? (context.querySelector("#txtManualName").value = "", showManualForm(context, !0)) : "false" == haspw ? authenticateUserByName(context, getApiClient(), name, "") : (context.querySelector("#txtManualName").value = name, context.querySelector("#txtManualPassword").value = "", showManualForm(context, !0, !0))
+                "manual" == id ? (context.querySelector("#txtManualName").value = "", showManualForm(context)) : "false" == haspw ? authenticateUserByName(context, getApiClient(), name, "") : (context.querySelector("#txtManualName").value = name, context.querySelector("#txtManualPassword").value = "", showManualForm(context, true))
             }
         }), view.querySelector(".manualLoginForm").addEventListener("submit", function(e) {
             appSettings.enableAutoLogin(view.querySelector(".chkRememberLogin").checked);
@@ -82,12 +82,10 @@ define(["appSettings", "dom", "connectionManager", "loading", "cardStyle", "emby
             return authenticateUserByName(view, apiClient, view.querySelector("#txtManualName").value, view.querySelector("#txtManualPassword").value), e.preventDefault(), !1
         }), view.querySelector(".btnForgotPassword").addEventListener("click", function() {
             Dashboard.navigate("forgotpassword.html")
-        }), view.querySelector(".btnCancel").addEventListener("click", showVisualForm), view.querySelector(".btnManual").addEventListener("click", function() {
-            view.querySelector("#txtManualName").value = "", showManualForm(view, !0)
         }), view.addEventListener("viewshow", function(e) {
             loading.show();
             var apiClient = getApiClient();
-            apiClient.getPublicUsers().then(function(users) {debugger;
+            apiClient.getPublicUsers().then(function(users) {
                 if (users.length) {
                     if (users[0].EnableAutoLogin) {
                         authenticateUserByName(view, apiClient, users[0].Name, "");
@@ -97,11 +95,12 @@ define(["appSettings", "dom", "connectionManager", "loading", "cardStyle", "emby
                     }
                 } else {
                     view.querySelector("#txtManualName").value = "";
-                    showManualForm(view, false, false);
+                    showManualForm(view, false);
                 }
 
             }).finally(function () {
                 loading.hide();
+                document.querySelector(".backgroundContainer").style.backgroundColor = "rgba(0, 0, 0, .75)";
             });
 
             apiClient.getJSON(apiClient.getUrl("Branding/Configuration")).then(function(options) {

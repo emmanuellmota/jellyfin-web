@@ -440,7 +440,7 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
         return getToolsMenuHtml(apiClient).then(function (toolsMenuHtml) {
             var html = "";
             html += '<a class="adminDrawerLogo clearLink" is="emby-linkbutton" href="home.html" style="text-align:left;">';
-            html += '<img src="img/logoblack.png" />';
+            html += '<img src="img/logodark.svg" />';
             html += "</a>";
             html += toolsMenuHtml;
             navDrawerScrollContainer.innerHTML = html;
@@ -915,7 +915,6 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
         html += "</div>";
         html += '<div class="headerTabs sectionTabs hide">';
         html += "</div>";
-        skinHeader.classList.add("skinHeader-withBackground");
         skinHeader.innerHTML = html;
         headerHomeButton = skinHeader.querySelector(".headerHomeButton");
         headerUserButton = skinHeader.querySelector(".headerUserButton");
