@@ -193,11 +193,12 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
             html += "</div>";
         }
 
+        html += '<div class="userMenuOptions">';
+        html += '<h3 class="sidebarHeader">';
+        html += globalize.translate("HeaderUser");
+        html += "</h3>";
         if (user.localUser) {
-            html += '<div class="userMenuOptions">';
-            html += '<h3 class="sidebarHeader">';
-            html += globalize.translate("HeaderUser");
-            html += "</h3>";
+            html += '<a is="emby-linkbutton" class="navMenuOption lnkMediaFolder lnkMySettings" href="mypreferencesmenu.html"><i class="md-icon navMenuOptionIcon">settings</i><span class="navMenuOptionText">' + globalize.translate("ButtonSettings") + "</span></a>";
             if (appHost.supports("multiserver")) {
                 html += '<a is="emby-linkbutton" class="navMenuOption lnkMediaFolder" data-itemid="selectserver" href="selectserver.html?showuser=1"><i class="md-icon navMenuOptionIcon">wifi</i><span class="navMenuOptionText">' + globalize.translate("ButtonSelectServer") + "</span></a>";
             }
@@ -307,7 +308,7 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
         });
         links.push({
             name: globalize.translate("TabDevices"),
-            href: "devices.html",
+            href: "devices/devices.html",
             pageIds: ["devicesPage", "devicePage"],
             icon: "devices"
         });
