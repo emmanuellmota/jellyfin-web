@@ -67,6 +67,10 @@ define(['events', 'dom', 'apphost', 'browser'], function (events, dom, appHost, 
         events.trigger(manager, 'fullscreenchange');
     }
 
+    function isTargetValid(target) {
+        return !dom.parentWithTag(target, ['BUTTON', 'INPUT', 'TEXTAREA']);
+    }
+
     dom.addEventListener(document, 'fullscreenchange', onFullScreenChange, {
         passive: true
     });
@@ -80,10 +84,6 @@ define(['events', 'dom', 'apphost', 'browser'], function (events, dom, appHost, 
     });
 
     if (appHost.supports("fullscreenchange") && (browser.edgeUwp || -1 !== navigator.userAgent.toLowerCase().indexOf("electron"))) {
-        function isTargetValid(target) {
-            return !dom.parentWithTag(target, ['BUTTON', 'INPUT', 'TEXTAREA']);
-        }
-
         dom.addEventListener(window, 'dblclick', function (e) {
 
             if (isTargetValid(e.target)) {
