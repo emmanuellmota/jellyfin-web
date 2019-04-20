@@ -64,6 +64,16 @@ define(['events'], function (events) {
 
                 requirejs.config({
                     waitSeconds: 0,
+                    paths: paths,
+                    packages: [{
+                        name: 'moment',
+                        location: 'bower_components/moment',
+                        main: 'moment'
+                    }]
+                });
+
+                requirejs.config({
+                    waitSeconds: 0,
                     paths: paths
                 });
 

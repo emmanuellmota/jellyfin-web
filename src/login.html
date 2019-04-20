@@ -1,41 +1,117 @@
-<div id="loginPage" data-role="page" class="page standalonePage" data-backbutton="false">
+<div id="loginPage" data-role="page" class="page userImagePage" data-backbutton="false" data-header="hide">
 
     <div class="padded-left padded-right padded-bottom-page">
 
-        <form class="manualLoginForm hide">
+        <form class="manualLoginForm view-centered hide">
 
-            <h1 style="margin-top:1em;text-align: left;">Entrar</h1>
+            <div is="emby-scroller" class="scrollFrameY flex flex-grow" data-mousewheel="true" data-horizontal="false" data-centerfocus="true">
 
-            <div style="height:0; overflow: hidden;"><input type="text" name="fakeusernameremembered" tabindex="-1" /><input type="password" name="fakepasswordremembered" tabindex="-1" /></div>
+                <div class="scrollSlider flex flex-grow flex-direction-column padded-left padded-right" style="justify-content: center">
 
-            <div class="inputContainer">
-                <input is="emby-input" type="text" id="txtManualName" required="required" label="${LabelUser}" />
+                    <h1 style="margin-top:1em;text-align: left;">Entrar</h1>
+
+                    <div style="height:0; overflow: hidden;"><input type="text" name="fakeusernameremembered" tabindex="-1" /><input type="password" name="fakepasswordremembered" tabindex="-1" /></div>
+
+                    <div class="inputContainer">
+                        <input is="emby-input" type="email" id="txtManualEmail" required="required" label="E-mail" style="text-transform: lowercase;" />
+                    </div>
+
+                    <div class="inputContainer">
+                        <input is="emby-input" id="txtManualPassword" type="password" label="${LabelPassword}" />
+                    </div>
+
+                    <label class="checkboxContainer">
+                        <input is="emby-checkbox" type="checkbox" class="chkRememberLogin" checked />
+                        <span>${RememberMe}</span>
+                    </label>
+
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>${ButtonSignIn}</span>
+                    </button>
+
+                    <button is="emby-button" type="button" class="raised cancel block btnForgotPassword">
+                        <span>${ButtonForgotPassword}</span>
+                    </button>
+
+                    <br />
+                    <br />
+
+                </div>
+
             </div>
 
-            <div class="inputContainer">
-                <input is="emby-input" id="txtManualPassword" type="password" label="${LabelPassword}" />
-            </div>
-
-            <label class="checkboxContainer">
-                <input is="emby-checkbox" type="checkbox" class="chkRememberLogin" checked />
-                <span>${RememberMe}</span>
-            </label>
-
-            <button is="emby-button" type="submit" class="raised button-submit block">
-                <span>${ButtonSignIn}</span>
-            </button>
-
-            <button is="emby-button" type="button" class="raised cancel block btnForgotPassword">
-                <span>${ButtonForgotPassword}</span>
-            </button>
-            <br />
-            <br />
         </form>
 
         <div class="visualLoginForm" style="text-align: center;">
-            <h1 style="margin-top:1em;">${HeaderPleaseSignIn}</h1>
-            <div id="divUsers" class="itemsContainer vertical-wrap centered"></div>
+
+            <div is="emby-scroller" class="scrollFrameY flex flex-grow" data-mousewheel="true" data-horizontal="false" data-centerfocus="card">
+
+                <div class="scrollSlider flex flex-grow flex-direction-column padded-left padded-right" style="justify-content: center">
+                    <h1 style="margin-top:1em;">Selecione um Perfil</h1>
+                    <div id="divUsers" class="itemsContainer vertical-wrap centered"></div>
+
+                </div>
+
+            </div>
+
         </div>
+
+        <form class="newImageForm userProfileSettingsForm hide">
+
+            <div style="margin: 0 32px">
+                <br />
+                <h1 class="title" style="margin:0;"></h1>
+                <br />
+
+                <div style="display: flex;">
+
+                    <button is="emby-button" class="fldImage md-icon block" style="display:inline-block;" data-action="menu"></button>
+
+                    <div style="margin: .5em 0 0 1em">
+                        <div style="display: inline-block; width: 100%;">
+                            <div class="inputContainer">
+                                <input is="emby-input" type="text" class="txtName" label="Nome" style="text-transform: capitalize;" />
+                            </div>
+                        </div>
+
+                        <div class="selectContainer">
+                            <select is="emby-select" class="selectMaxParentalRating" label="${LabelMaxParentalRating}"></select>
+                            <div class="fieldDescription">${MaxParentalRatingHelp}</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="fldUpload" style="margin-top:1em;">
+                    <button is="emby-button" type="submit" class="raised button-submit block">${ButtonSave}</button>
+                </div>
+
+                <button is="emby-button" type="button" class="raised cancel block btnCancel">
+                    <span>${ButtonCancel}</span>
+                </button>
+            </div>
+
+            <div class="hide">
+
+                <div class="flex align-items-center hide" style="margin:1.5em 0;">
+                    <h1 style="margin:0;">${HeaderUploadNewImage}</h1>
+
+                    <button is="emby-button" type="button" class="fab btnBrowse" style="margin-left:1em;" title="${Browse}">
+                        <i class="md-icon">add</i>
+                    </button>
+                </div>
+
+                <div class="fldNewImage hide">
+
+                    <div class="userImageDropZone imageDropZone squareImageDropZone fieldDescription">
+                        <div>${LabelDropImageHere}</div>
+                        <output class="userImageOutput flex align-items-center justify-content-center" style="position: absolute;top:0;left:0;right:0;bottom:0;width:100%;"></output>
+                        <input type="file" accept="image/*" class="uploadUserImage" name="uploadUserImage" style="position: absolute;top:0;left:0;right:0;bottom:0;width:100%;opacity:0;" />
+                    </div>
+                </div>
+
+            </div>
+        </form>
 
         <div class="readOnlyContent" style="margin: .5em auto 1em;">
 
@@ -43,4 +119,5 @@
         </div>
 
     </div>
+
 </div>

@@ -226,7 +226,8 @@ define([
         path: "/mypreferencesdisplay.html",
         autoFocus: false,
         transition: "fade",
-        controller: "mypreferencesdisplay"
+        controller: "mypreferencesdisplay",
+        roles: "admin"
     });
     defineRoute({
         path: "/mypreferenceshome.html",
@@ -244,7 +245,8 @@ define([
         path: "/mypreferenceslanguages.html",
         autoFocus: false,
         transition: "fade",
-        controller: "mypreferenceslanguages"
+        controller: "mypreferenceslanguages",
+        roles: "admin"
     });
     defineRoute({
         path: "/mypreferencesmenu.html",

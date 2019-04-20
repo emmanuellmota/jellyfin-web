@@ -138,6 +138,10 @@ define(["appSettings", "browser", "events", "htmlMediaHelper"], function (appSet
         return (element.requestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen || element.msRequestFullscreen) || document.createElement("video").webkitEnterFullscreen;
     }
 
+    function supportsSoundEffects() {
+        return !browser.tizen && (!browser.web0s && !(!self.AudioContext && !self.webkitAudioContext))
+    }
+
     function getSyncProfile() {
         return new Promise(function (resolve) {
             require(["browserdeviceprofile", "appSettings"], function (profileBuilder, appSettings) {
@@ -254,6 +258,10 @@ define(["appSettings", "browser", "events", "htmlMediaHelper"], function (appSet
             features.push("fullscreenchange");
         }
 
+        if (supportsSoundEffects()) {
+            features.push("soundeffects");
+        }
+
         if (browser.chrome || browser.edge && !browser.slow) {
             if (!browser.noAnimation && !browser.edgeUwp && !browser.xboxOne) {
                 features.push("imageanalysis");
@@ -368,7 +376,7 @@ define(["appSettings", "browser", "events", "htmlMediaHelper"], function (appSet
             return window.NativeShell ? window.NativeShell.AppHost.deviceId() : deviceId;
         },
         appName: function () {
-            return window.NativeShell ? window.NativeShell.AppHost.appName() : "Jellyfin Web";
+            return window.NativeShell ? window.NativeShell.AppHost.appName() : "NeexTV Web";
         },
         appVersion: function () {
             return window.NativeShell ? window.NativeShell.AppHost.appVersion() : appVersion;

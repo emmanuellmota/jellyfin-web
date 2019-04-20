@@ -10,10 +10,8 @@ define(["apphost", "connectionManager", "listViewStyle", "emby-button"], functio
             var page = this;
             var userId = params.userId || Dashboard.getCurrentUserId();
 
-            page.querySelector(".lnkDisplayPreferences").setAttribute("href", "mypreferencesdisplay.html?userId=" + userId);
             page.querySelector(".lnkLanguagePreferences").setAttribute("href", "mypreferenceslanguages.html?userId=" + userId);
             page.querySelector(".lnkSubtitleSettings").setAttribute("href", "mypreferencessubtitles.html?userId=" + userId);
-            page.querySelector(".lnkHomeScreenPreferences").setAttribute("href", "mypreferenceshome.html?userId=" + userId);
             page.querySelector(".lnkMyProfile").setAttribute("href", "myprofile.html?userId=" + userId);
 
             if (appHost.supports("multiserver")) {
@@ -31,9 +29,13 @@ define(["apphost", "connectionManager", "listViewStyle", "emby-button"], functio
             });
 
             Dashboard.getCurrentUser().then(function(user) {
-                page.querySelector(".headerUser").innerHTML = user.Name;
                 if (user.Policy.IsAdministrator) {
                     page.querySelector(".adminSection").classList.remove("hide");
+
+                    page.querySelector(".lnkDisplayPreferences").classList.remove("hide");
+                    page.querySelector(".lnkHomeScreenPreferences").classList.remove("hide");
+                    page.querySelector(".lnkDisplayPreferences").setAttribute("href", "mypreferencesdisplay.html?userId=" + userId);
+                    page.querySelector(".lnkHomeScreenPreferences").setAttribute("href", "mypreferenceshome.html?userId=" + userId);
                 } else {
                     page.querySelector(".adminSection").classList.add("hide");
                 }

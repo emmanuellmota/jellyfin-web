@@ -29,6 +29,35 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+function setParameterByName(name, value, url) {
+    url = url || window.location.href;
+
+    var baseUrl = url.split('?')[0],
+        urlQueryString = '?' + url.split('?')[1],
+        newParam = name + '=' + value,
+        params = '?' + newParam;
+
+    if (urlQueryString) {
+        var updateRegex = new RegExp('([\?&])' + name + '[^&]*');
+        var removeRegex = new RegExp('([\?&])' + name + '=[^&;]+[&;]?');
+
+        if (typeof value === 'undefined' || value === null || value === '') {
+            params = urlQueryString.replace(removeRegex, "$1");
+            params = params.replace(/[&;]$/, "");
+
+        } else if (urlQueryString.match(updateRegex) !== null) {
+            params = urlQueryString.replace(updateRegex, "$1" + newParam);
+
+        } else {
+            params = urlQueryString + '&' + newParam;
+        }
+    }
+
+    params = params === '?' ? '' : params;
+
+    return baseUrl + params;
+}
+
 function pageClassOn(eventName, className, fn) {
     "use strict";
 
@@ -51,6 +80,46 @@ function pageIdOn(eventName, id, fn) {
             fn.call(target, event);
         }
     });
+}
+
+function makeBlurredCopy() {
+    if (Emby.Page.current().anonymous) return false;
+
+    var backdropContainer = document.querySelector(".backdropContainer").cloneNode(true);
+    var backgroundContainer = document.querySelector(".backgroundContainer").cloneNode(true);
+    var backdropContainerCopy = document.querySelector(".backdropContainerCopy");
+    backdropContainerCopy.innerHTML = "";
+    backdropContainerCopy.append(backdropContainer);
+    backdropContainerCopy.append(backdropContainer.cloneNode(true));
+    backdropContainerCopy.append(backgroundContainer);
+
+    var timeout;
+    var header = document.querySelector(".skinHeader");
+    var duplicate = document.querySelector(".mainAnimatedPages > div:not(.hide)").cloneNode(true);
+    var contentBlurred = document.createElement("div");
+    contentBlurred.className = "content-blurred";
+    contentBlurred.appendChild(duplicate);
+    if (document.querySelector(".content-blurred")) document.querySelector(".content-blurred").remove()
+    header.appendChild(contentBlurred);
+
+    function updateBlurContentLocation() {
+        var top = window.scrollY;
+        var translation = "translate3d(0," + (-top + "px") + ",0)";
+        duplicate.style["-webkit-transform"] = translation;
+        duplicate.style["-moz-transform"] = translation;
+        duplicate.style["-ms-transform"] = translation;
+        duplicate.style["transform"] = translation;
+        header.classList[top === 0 ? "remove" : "add"]("withShadow");
+    }
+
+    window.addEventListener("scroll", function (event) {
+        if (timeout) {
+            window.cancelAnimationFrame(timeout);
+        }
+        timeout = window.requestAnimationFrame(updateBlurContentLocation);
+    }, false);
+
+    updateBlurContentLocation();
 }
 
 var Dashboard = {
@@ -300,7 +369,7 @@ var AppInfo = {};
                         connectionManager.addApiClient(apiClient);
 
                         window.ApiClient = apiClient;
-                        localApiClient   = apiClient;
+                        localApiClient = apiClient;
 
                         console.log("loaded ApiClient singleton");
                     });
@@ -513,7 +582,7 @@ var AppInfo = {};
             require(["systemFontsCss"]);
         }
 
-        require(["apphost", "css!css/librarybrowser"], function (appHost) {
+        require(["apphost", "css!css/librarybrowser", "components/input/keyboard"], function (appHost) {
             loadPlugins([], appHost, browser).then(function () {
                 onAppReady(browser);
             });
@@ -528,7 +597,8 @@ var AppInfo = {};
             "components/htmlaudioplayer/plugin",
             "components/htmlvideoplayer/plugin",
             "components/photoplayer/plugin",
-            "components/youtubeplayer/plugin"
+            "components/youtubeplayer/plugin",
+            "plugins/defaultsoundeffects/plugin"
         ];
 
         if (appHost.supports("remotecontrol")) {
@@ -587,7 +657,7 @@ var AppInfo = {};
                         hashbang: true
                     });
 
-                    require(["components/thememediaplayer", "scripts/autobackdrops"]);
+                    require(["components/thememediaplayer", "scripts/autobackdrops", "soundEffectsManager"]);
 
                     if (!browser.tv && !browser.xboxOne && !browser.ps4) {
                         require(["components/nowplayingbar/nowplayingbar"]);
@@ -706,7 +776,9 @@ var AppInfo = {};
             autoPlayDetect: componentsPath + "/playback/autoPlayDetect",
             nowPlayingHelper: componentsPath + "/playback/nowplayinghelper",
             pluginManager: componentsPath + "/pluginmanager",
-            packageManager: componentsPath + "/packagemanager"
+            packageManager: componentsPath + "/packagemanager",
+            soundeffects: "components/soundeffects",
+            soundEffectsManager: "components/soundeffectsmanager"
         };
         paths.hlsjs = bowerPath + "/hlsjs/dist/hls.min";
         paths.flvjs = "thirdparty/flvjs/flv.min";

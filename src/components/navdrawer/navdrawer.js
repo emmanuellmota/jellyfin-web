@@ -131,7 +131,7 @@ define(["browser", "dom", "css!./navdrawer", "scrollStyles"], function(browser, 
         TouchMenuLA.prototype.initElements = function() {
             options.target.classList.add("touch-menu-la"), options.target.style.width = options.width + "px", options.target.style.left = -options.width + "px", options.disableMask || (mask = document.createElement("div"), mask.className = "tmla-mask hide", document.body.appendChild(mask), dom.addEventListener(mask, dom.whichTransitionEvent(), onMaskTransitionEnd, {
                 passive: !0
-            }))
+            }));
         };
         var menuTouchStartX, menuTouchStartY, menuTouchStartTime, edgeContainer = document.querySelector(".mainDrawerHandle"),
             isPeeking = !1;
@@ -148,8 +148,16 @@ define(["browser", "dom", "css!./navdrawer", "scrollStyles"], function(browser, 
         }, TouchMenuLA.prototype.checkMenuState = function(deltaX, deltaY) {
             velocity >= .4 ? deltaX >= 0 || Math.abs(deltaY || 0) >= 70 ? self.open() : self.close() : newPos >= 100 ? self.open() : newPos && self.close()
         }, TouchMenuLA.prototype.open = function() {
+            Array.prototype.forEach.call(options.target.querySelectorAll("a[href], area[href], input, select, textarea, button, iframe, object, embed"), function (el) {
+                el.removeAttribute("tabindex");
+                el.removeAttribute("focusable");
+            });
             this.animateToPosition(options.width), currentPos = options.width, this.isVisible = !0, options.target.classList.add("drawer-open"), self.showMask(), self.invoke(options.onChange)
         }, TouchMenuLA.prototype.close = function() {
+            Array.prototype.forEach.call(options.target.querySelectorAll("a[href], area[href], input, select, textarea, button, iframe, object, embed"), function (el) {
+                el.setAttribute("tabindex", "-1");
+                el.setAttribute("focusable", "false");
+            });
             this.animateToPosition(0), currentPos = 0, self.isVisible = !1, options.target.classList.remove("drawer-open"), self.hideMask(), self.invoke(options.onChange)
         }, TouchMenuLA.prototype.toggle = function() {
             self.isVisible ? self.close() : self.open()
@@ -192,7 +200,7 @@ define(["browser", "dom", "css!./navdrawer", "scrollStyles"], function(browser, 
                 passive: !0
             }), dom.addEventListener(mask, "touchcancel", onBackgroundTouchEnd, {
                 passive: !0
-            })), self.clickMaskClose()
+            })), self.clickMaskClose();
         }, new TouchMenuLA
     }
 });

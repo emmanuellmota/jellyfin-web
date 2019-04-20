@@ -6,17 +6,17 @@ define(['connectionManager', 'cardBuilder', 'appSettings', 'dom', 'apphost', 'la
         switch (index) {
 
             case 0:
-                return 'smalllibrarytiles';
-            case 1:
                 return 'resume';
-            case 2:
+            case 1:
                 return 'resumeaudio';
-            case 3:
+            case 2:
                 return 'livetv';
-            case 4:
+            case 3:
                 return 'nextup';
-            case 5:
+            case 4:
                 return 'latestmedia';
+            case 5:
+                return 'none';
             case 6:
                 return 'none';
             default:

@@ -608,6 +608,8 @@ define(['loading', 'globalize', 'events', 'viewManager', 'layoutManager', 'skinM
             resolveOnNextShow = null;
             resolve();
         }
+
+        setTimeout(makeBlurredCopy, 800);
     });
 
     var currentRouteInfo;

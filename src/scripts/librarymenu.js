@@ -1,5 +1,11 @@
 define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "viewManager", "libraryBrowser", "appRouter", "apphost", "playbackManager", "browser", "globalize", "paper-icon-button-light", "material-icons", "scrollStyles", "flexStyles"], function (dom, layoutManager, inputManager, connectionManager, events, viewManager, libraryBrowser, appRouter, appHost, playbackManager, browser, globalize) {
     "use strict";
+    var transitionTimer = undefined;
+    var activeTab = 0;
+    var sp = {
+        rightSide: 0,
+        leftSide: 0,
+    }
 
     function getCurrentApiClient() {
         if (currentUser && currentUser.localUser) {
@@ -177,7 +183,7 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
     function refreshLibraryInfoInDrawer(user, drawer) {
         var html = "";
         html += '<div style="height:.5em;"></div>';
-        html += '<a is="emby-linkbutton" class="navMenuOption lnkMediaFolder" href="home.html"><i class="md-icon navMenuOptionIcon">home</i><span class="navMenuOptionText">' + globalize.translate("ButtonHome") + "</span></a>";
+        html += '<a tabindex="-1" focusable="false" is="emby-linkbutton" class="navMenuOption lnkMediaFolder" href="home.html"><i class="md-icon navMenuOptionIcon">home</i><span class="navMenuOptionText">' + globalize.translate("ButtonHome") + "</span></a>";
 
         // libraries are added here
         html += '<div class="libraryMenuOptions">';
@@ -188,8 +194,8 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
             html += '<h3 class="sidebarHeader">';
             html += globalize.translate("HeaderAdmin");
             html += "</h3>";
-            html += '<a is="emby-linkbutton" class="navMenuOption lnkMediaFolder lnkManageServer" data-itemid="dashboard" href="dashboard.html"><i class="md-icon navMenuOptionIcon">dashboard</i><span class="navMenuOptionText">' + globalize.translate("TabDashboard") + "</span></a>";
-            html += '<a is="emby-linkbutton" class="navMenuOption lnkMediaFolder editorViewMenu" data-itemid="editor" href="edititemmetadata.html"><i class="md-icon navMenuOptionIcon">mode_edit</i><span class="navMenuOptionText">' + globalize.translate("Metadata") + "</span></a>";
+            html += '<a tabindex="-1" focusable="false" is="emby-linkbutton" class="navMenuOption lnkMediaFolder lnkManageServer" data-itemid="dashboard" href="dashboard.html"><i class="md-icon navMenuOptionIcon">dashboard</i><span class="navMenuOptionText">' + globalize.translate("TabDashboard") + "</span></a>";
+            html += '<a tabindex="-1" focusable="false" is="emby-linkbutton" class="navMenuOption lnkMediaFolder editorViewMenu" data-itemid="editor" href="edititemmetadata.html"><i class="md-icon navMenuOptionIcon">mode_edit</i><span class="navMenuOptionText">' + globalize.translate("Metadata") + "</span></a>";
             html += "</div>";
         }
 
@@ -198,12 +204,12 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
         html += globalize.translate("HeaderUser");
         html += "</h3>";
         if (user.localUser) {
-            html += '<a is="emby-linkbutton" class="navMenuOption lnkMediaFolder lnkMySettings" href="mypreferencesmenu.html"><i class="md-icon navMenuOptionIcon">settings</i><span class="navMenuOptionText">' + globalize.translate("ButtonSettings") + "</span></a>";
+            html += '<a tabindex="-1" focusable="false" is="emby-linkbutton" class="navMenuOption lnkMediaFolder lnkMySettings" href="mypreferencesmenu.html"><i class="md-icon navMenuOptionIcon">settings</i><span class="navMenuOptionText">' + globalize.translate("ButtonSettings") + "</span></a>";
             if (appHost.supports("multiserver")) {
-                html += '<a is="emby-linkbutton" class="navMenuOption lnkMediaFolder" data-itemid="selectserver" href="selectserver.html?showuser=1"><i class="md-icon navMenuOptionIcon">wifi</i><span class="navMenuOptionText">' + globalize.translate("ButtonSelectServer") + "</span></a>";
+                html += '<a tabindex="-1" focusable="false" is="emby-linkbutton" class="navMenuOption lnkMediaFolder" data-itemid="selectserver" href="selectserver.html?showuser=1"><i class="md-icon navMenuOptionIcon">wifi</i><span class="navMenuOptionText">' + globalize.translate("ButtonSelectServer") + "</span></a>";
             }
             if (!user.localUser.EnableAutoLogin) {
-                html += '<a is="emby-linkbutton" class="navMenuOption lnkMediaFolder btnLogout" data-itemid="logout" href="#"><i class="md-icon navMenuOptionIcon">exit_to_app</i><span class="navMenuOptionText">' + globalize.translate("ButtonSignOut") + "</span></a>";
+                html += '<a tabindex="-1" focusable="false" is="emby-linkbutton" class="navMenuOption lnkMediaFolder btnLogout" data-itemid="logout" href="#"><i class="md-icon navMenuOptionIcon">exit_to_app</i><span class="navMenuOptionText">' + globalize.translate("ButtonSignOut") + "</span></a>";
             }
         }
         html += "</div>";
@@ -452,6 +458,8 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
         var section = this.getElementsByClassName("sectionName")[0];
         var text = section ? section.innerHTML : this.innerHTML;
         LibraryMenu.setTitle(text);
+        var index = Array.prototype.slice.call(document.querySelector(".tabs").children).indexOf(document.querySelector(".tabs a[data-itemid=" + section.closest("a").getAttribute("data-itemid") + "]"));
+        onTabLinkClick(null, index);
     }
 
     function getUserViews(apiClient, userId) {
@@ -518,11 +526,13 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
 
         var userId = Dashboard.getCurrentUserId();
         var apiClient = getCurrentApiClient();
+        var tabs = document.querySelector(".skinHeader .headerTop .tabs");
         var libraryMenuOptions = document.querySelector(".libraryMenuOptions");
 
         if (libraryMenuOptions) {
             getUserViews(apiClient, userId).then(function (result) {
                 var items = result;
+                tabs.innerHTML = "";
                 var html = "";
                 html += '<h3 class="sidebarHeader">';
                 html += globalize.translate("HeaderMedia");
@@ -568,18 +578,117 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
                         i.onclick;
                     }
 
-                    return '<a is="emby-linkbutton" data-itemid="' + itemId + '" class="lnkMediaFolder navMenuOption" href="' + getItemHref(i, i.CollectionType) + '"><i class="md-icon navMenuOptionIcon">' + icon + '</i><span class="sectionName navMenuOptionText">' + i.Name + "</span></a>";
+                    return '<a tabindex="-1" focusable="false" is="emby-linkbutton" data-itemid="' + itemId + '" class="lnkMediaFolder navMenuOption" href="' + getItemHref(i, i.CollectionType) + '"><i class="md-icon navMenuOptionIcon">' + icon + '</i><span class="sectionName navMenuOptionText">' + i.Name + "</span></a>";
                 }).join("");
                 libraryMenuOptions.innerHTML = html;
+
                 var elem = libraryMenuOptions;
                 var sidebarLinks = elem.querySelectorAll(".navMenuOption");
-
                 for (var i = 0, length = sidebarLinks.length; i < length; i++) {
                     sidebarLinks[i].removeEventListener("click", onSidebarLinkClick);
                     sidebarLinks[i].addEventListener("click", onSidebarLinkClick);
                 }
+
+                var tabLinks = document.querySelectorAll('.mainDrawer-scrollContainer > .emby-button, .mainDrawer-scrollContainer > .libraryMenuOptions > .navMenuOption');
+                for (var i = 0, length = tabLinks.length; i < length; i++) {
+                    var duplicate = tabLinks[i].cloneNode(true);
+                    duplicate.removeAttribute("tabindex");
+                    duplicate.removeAttribute("focusable");
+                    duplicate.setAttribute("data-index", i === 0 ? 0 : i + 1);
+                    duplicate.removeEventListener("click", onTabLinkClick);
+                    duplicate.addEventListener("click", onTabLinkClick);
+                    tabs.appendChild(duplicate);
+
+                    if (i === 0) {
+                        var favoriteTab = duplicate.cloneNode(true);
+                        favoriteTab.setAttribute("data-index", 1);
+                        favoriteTab.removeAttribute("data-itemid");
+                        favoriteTab.querySelector(".navMenuOptionText").innerHTML = "Favoritos";
+                        favoriteTab.href = "home.html?tab=1";
+
+                        favoriteTab.removeEventListener("click", onSidebarFavoriteTabClick);
+                        favoriteTab.addEventListener("click", onSidebarFavoriteTabClick);
+
+                        tabs.appendChild(favoriteTab);
+                    }
+                }
+
+                var line = document.createElement("div");
+                line.className = "line hide";
+                line.setAttribute("ref", "line");
+                tabs.appendChild(line);
+
+                window.removeEventListener("hashchange", updateMainSelectedTab);
+                window.addEventListener("hashchange", updateMainSelectedTab);
+
+                updateMainSelectedTab();
             });
         }
+    }
+
+    function onSidebarFavoriteTabClick() {
+        onTabLinkClick(null, 1);
+    }
+
+    function onTabLinkClick(e, idx) {
+        idx = (idx == null) ? this.getAttribute("data-index") : idx || 0;
+        selectTab(document.querySelector(".tabs"), idx);
+    }
+
+    function updateMainSelectedTab() {
+        var tabs = document.querySelector(".skinHeader .headerTop .tabs");
+
+        selectTab(tabs, Array.from(tabs.querySelectorAll('a')).findIndex(function (e) {
+            return location.href.indexOf(e.href.replace(/(.*web\/)(.*)(html.*)/, "$2html")) >= 0;
+        }));
+    }
+
+    function selectTab(tabs, index, init) {
+        if (index === -1) return;;
+
+        var previousTab = tabs.querySelector(".selected");
+        previousTab && previousTab.classList.remove("selected");
+        var currentTab = tabs.children[index];
+        currentTab.classList.add("selected");
+        var tabsWidth = tabs.getBoundingClientRect().width;
+        var currentTabWidth = currentTab.getBoundingClientRect().width;
+        var line = tabs.querySelector(".line");
+
+        var rightPercentage = ((currentTab.offsetLeft - 15) + currentTabWidth) * 100 / tabsWidth + '%';
+        var leftPercentage = (currentTab.offsetLeft + 15) * 100 / tabsWidth + '%';
+
+        var sideProperty = function (withTimer) {
+            if (!withTimer) return index > activeTab ? 'rightSide' : 'leftSide';
+
+            return index > activeTab ? 'leftSide' : 'rightSide';
+        }
+
+        var sidePercentage = function (withTimer) {
+            if (!withTimer) return index > activeTab ? rightPercentage : leftPercentage;
+
+            return index > activeTab ? leftPercentage : rightPercentage;
+        }
+
+        sp[sideProperty()] = sidePercentage();
+        line.style.setProperty("clip-path", "polygon(" + sp.leftSide + " 0, " + sp.rightSide + " 0, " + sp.rightSide + " 100%, " + sp.leftSide + " 100% )");
+
+        if (init) {
+            sp[sideProperty(true)] = sidePercentage(true);
+            line.style.setProperty("clip-path", "polygon(" + sp.leftSide + " 0, " + sp.rightSide + " 0, " + sp.rightSide + " 100%, " + sideProperty.sp + " 100% )");
+
+            return;
+        }
+
+        if (transitionTimer) {
+            clearTimeout(transitionTimer)
+        }
+
+        transitionTimer = setTimeout(function () {
+            sp[sideProperty(true)] = sidePercentage(true);
+            line.style.setProperty("clip-path", "polygon(" + sp.leftSide + " 0, " + sp.rightSide + " 0, " + sp.rightSide + " 100%, " + sp.leftSide + " 100% )");
+            line.classList.remove("hide");
+            transitionTimer = undefined;
+        }, 150);
     }
 
     function getTopParentId() {
@@ -723,6 +832,13 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
         }
     }
 
+    function updateHeader(page) {
+        var dataHeader = page.getAttribute("data-header");
+
+        document.querySelector(".headerTop .mainDrawerButton").classList[dataHeader === "hide" ? "add" : "remove"]("hide");
+        document.querySelector(".headerTop .tabs").classList[dataHeader === "hide" ? "add" : "remove"]("hide");
+    }
+
     function initHeadRoom(elem) {
         require(["headroom"], function (Headroom) {
             var headroom = new Headroom([], {});
@@ -765,10 +881,19 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
         return new Promise(function (resolve, reject) {
             require(["navdrawer"], function (navdrawer) {
                 navDrawerInstance = new navdrawer(getNavDrawerOptions());
-                navDrawerElement.classList.remove("hide");
+                !layoutManager.tv && navDrawerElement.classList.remove("hide");
                 resolve(navDrawerInstance);
             });
         });
+    }
+
+    function navigateToHome() {
+        var homeTab = document.querySelector(".skinHeader .tabs a:first-child");
+        if (homeTab) {
+            homeTab.click();
+        } else {
+            Dashboard.navigate("home.html");
+        }
     }
 
     var navDrawerElement;
@@ -812,14 +937,20 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
             if (pageTitleElement) {
                 pageTitleElement.classList.add("pageTitleWithLogo");
                 pageTitleElement.classList.add("pageTitleWithDefaultLogo");
+                pageTitleElement.removeEventListener("click", navigateToHome);
+                pageTitleElement.addEventListener("click", navigateToHome);
                 pageTitleElement.style.backgroundImage = null;
                 pageTitleElement.innerHTML = "";
             }
 
-            document.title = "Jellyfin";
+            document.title = "NeexTV";
         },
         setTitle: function (title) {
-            if (null == title) {
+            if (!pageTitleElement) {
+                pageTitleElement = document.querySelector(".pageTitle");
+            }
+
+            if (null == title || pageTitleElement) {
                 return void LibraryMenu.setDefaultTitle();
             }
 
@@ -827,20 +958,16 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
                 title = "";
             }
 
-            var html = title;
-
-            if (!pageTitleElement) {
-                pageTitleElement = document.querySelector(".pageTitle");
-            }
+            /* var html = title;
 
             if (pageTitleElement) {
                 pageTitleElement.classList.remove("pageTitleWithLogo");
                 pageTitleElement.classList.remove("pageTitleWithDefaultLogo");
                 pageTitleElement.style.backgroundImage = null;
                 pageTitleElement.innerHTML = html || "";
-            }
+            } */
 
-            document.title = title || "Jellyfin";
+            document.title = title.replace(/^(?!NeexTV)(.*?)/, "NeexTV - $1") || "NeexTV";
         },
         setTransparentMenu: function (transparent) {
             if (transparent) {
@@ -891,16 +1018,19 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
         updateTitle(page);
         updateBackButton(page);
         updateLibraryNavLinks(page);
+        updateHeader(page);
     });
 
     (function () {
         var html = "";
+        html += '<div class="backdropContainerCopy"></div>';
         html += '<div class="flex align-items-center flex-grow headerTop">';
         html += '<div class="headerLeft">';
         html += '<button type="button" is="paper-icon-button-light" class="headerButton headerButtonLeft headerBackButton hide"><i class="md-icon">' + (browser.safari ? "chevron_left" : "&#xE5C4;") + "</i></button>";
         html += '<button type="button" is="paper-icon-button-light" class="headerButton headerHomeButton hide barsMenuButton headerButtonLeft"><i class="md-icon">&#xE88A;</i></button>';
         html += '<button type="button" is="paper-icon-button-light" class="headerButton mainDrawerButton barsMenuButton headerButtonLeft hide"><i class="md-icon">&#xE5D2;</i></button>';
         html += '<h3 class="pageTitle"></h3>';
+        html += '<div class="tabs"></div>';
         html += "</div>";
         html += '<div class="headerRight">';
         html += '<span class="headerSelectedPlayer"></span>';

@@ -1,14 +1,25 @@
-define(["appSettings", "dom", "connectionManager", "loading", "cardStyle", "emby-checkbox"], function(appSettings, dom, connectionManager, loading) {
+define(["moment", "appSettings", "dom", "connectionManager", "loading", "focusManager", "emby-scroller", "cardStyle", "emby-checkbox"], function (moment, appSettings, dom, connectionManager, loading, focusManager) {
     "use strict";
+    var token = null;
 
-    function authenticateUserByName(page, apiClient, username, password) {
-        loading.show(), apiClient.authenticateUserByName(username, password).then(function(result) {
+    function authenticateUserByToken(page, apiClient, guid, accessToken) {
+        loading.show(), apiClient.authenticateUserByToken(guid, accessToken).then(function (result) {
             var newUrl, user = result.User,
                 serverId = getParameterByName("serverid");
-            newUrl = user.Policy.IsAdministrator && !serverId ? "dashboard.html" : "home.html", loading.hide(), Dashboard.onServerChanged(user.Id, result.AccessToken, apiClient), Dashboard.navigate(newUrl)
-        }, function(response) {
-            page.querySelector("#txtManualName").value = "", page.querySelector("#txtManualPassword").value = "", loading.hide(), 401 == response.status ? require(["toast"], function(toast) {
-                toast(Globalize.translate("MessageInvalidUser"))
+            newUrl = user.Policy.IsAdministrator && !serverId ? "dashboard.html" : "home.html", loading.hide(), Dashboard.onServerChanged(user.Id, result.AccessToken, apiClient), Dashboard.navigate(newUrl);
+        }, function (response) {
+            page.querySelector("#txtManualEmail").value = "", page.querySelector("#txtManualPassword").value = "", loading.hide(), 401 == response.status ? require(["toast"], function (toast) {
+                toast("Erro indefinido.")
+            }) : showServerConnectionFailure()
+        })
+    }
+
+    function authenticateAccount(page, apiClient, email, password) {
+        loading.show(), apiClient.authenticateAccount(email, password).then(function (response) {
+            token = response.AccessToken, apiClient.getUsers({ AccessToken: token }).then(function (r) { return r.json() }).then(function (users) { window.users = users; (showVisualForm(page), loadUserList(page, apiClient, users), loading.hide()) }).catch(function () { (showManualForm(page, !1), loading.hide()) })
+        }, function (response) {
+            page.querySelector("#txtManualEmail").value = "", page.querySelector("#txtManualPassword").value = "", loading.hide(), 401 == response.status ? require(["toast"], function (toast) {
+                response.text().then(function (error) { toast(error) });
             }) : showServerConnectionFailure()
         })
     }
@@ -21,7 +32,23 @@ define(["appSettings", "dom", "connectionManager", "loading", "cardStyle", "emby
     }
 
     function showManualForm(context, focusPassword) {
-        context.querySelector(".chkRememberLogin").checked = appSettings.enableAutoLogin(), context.querySelector(".manualLoginForm").classList.remove("hide"), context.querySelector(".visualLoginForm").classList.add("hide"), focusPassword ? context.querySelector("#txtManualPassword").focus() : context.querySelector("#txtManualName").focus()
+        var bg = new Image();
+        bg.onload = function () {
+            document.querySelector(".backgroundContainer").style.backgroundColor = "rgba(0, 0, 0, .75)";
+        }
+        bg.src = "/web/img/movies_wall.jpg";
+
+        context.querySelector(".chkRememberLogin").checked = appSettings.enableAutoLogin(), context.querySelector(".manualLoginForm").classList.remove("hide"), context.querySelector(".visualLoginForm").classList.add("hide"), focusManager.focus(focusPassword ? context.querySelector("#txtManualPassword") : context.querySelector("#txtManualEmail"))
+    }
+
+    function showVisualForm(context) {
+        document.querySelector(".backgroundContainer").style.backgroundColor = null;
+
+        context.querySelector(".visualLoginForm").classList.remove("hide"), context.querySelector(".manualLoginForm").classList.add("hide");
+        setTimeout(function () {
+            var card = context.querySelector('button.card:enabled');
+            card && focusManager.focus(card);
+        });
     }
 
     function getRandomMetroColor() {
@@ -41,7 +68,9 @@ define(["appSettings", "dom", "connectionManager", "loading", "cardStyle", "emby
     function loadUserList(context, apiClient, users) {
         for (var html = "", i = 0, length = users.length; i < length; i++) {
             var user = users[i];
-            html += '<button type="button" class="card squareCard scalableCard squareCard-scalable"><div class="cardBox cardBox-bottompadded">', html += '<div class="cardScalable">', html += '<div class="cardPadder cardPadder-square"></div>', html += '<div class="cardContent" data-haspw="' + user.HasPassword + '" data-username="' + user.Name + '" data-userid="' + user.Id + '">';
+            var session = user.LastActivityDate ? user.Session ? user.Session.IsActive ? ["Atualmente online em", user.Session.Client, "style='color: #1684e3;'"] : null : ["Última vez online", moment(user.LastActivityDate).fromNow()] : ["Última vez online", "Ainda não entrou"];
+
+            html += '<button type="button" class="card squareCard scalableCard squareCard-scalable"><div class="cardBox">', html += '<div class="cardScalable">', html += '<div class="cardPadder cardPadder-square"></div>', html += '<div class="cardContent" data-userid="' + user.Id + '">';
             var imgUrl;
             if (user.PrimaryImageTag) imgUrl = apiClient.getUserImageUrl(user.Id, {
                 width: 300,
@@ -52,55 +81,87 @@ define(["appSettings", "dom", "connectionManager", "loading", "cardStyle", "emby
                 var background = getMetroColor(user.Id);
                 imgUrl = "img/logindefault.png", html += '<div class="cardImageContainer coveredImage coveredImage-noScale" style="background-image:url(\'' + imgUrl + "');background-color:" + background + ';"></div>'
             }
-            html += "</div>", html += "</div>", html += '<div class="cardFooter visualCardBox-cardFooter">', html += '<div class="cardText singleCardText cardTextCentered">' + user.Name + "</div>", html += "</div>", html += "</div>", html += "</button>"
+            html += "</div>", html += "</div>", html += '<div class="title">', html += '<div class="cardText singleCardText">' + user.Name.replace(/\[(.+?)\]/g, '') + "</div>", html += "</div>", html += "<div class='session' " + (session[2] || "") + "><span>" + session[0] + "</span><span>" + session[1] + "</span></div>", html += "</div>", html += "</button>"
         }
         context.querySelector("#divUsers").innerHTML = html
+
+        if (users.length < 5) {
+            var createAccountButton = document.createElement("button");
+            createAccountButton.className = "createAccount card";
+            var card = document.createElement("div");
+            card.className = "cardBox";
+            createAccountButton.append(card);
+            context.querySelector("#divUsers").append(createAccountButton);
+        }
     }
+
     var metroColors = ["#6FBD45", "#4BB3DD", "#4164A5", "#E12026", "#800080", "#E1B222", "#008040", "#0094FF", "#FF00C7", "#FF870F", "#7F0037"];
-    return function(view, params) {
+
+    return function (view, params) {
+        Emby.Page.setTitle(null);
+
         function getApiClient() {
             var serverId = params.serverid;
             return serverId ? connectionManager.getOrCreateApiClient(serverId) : ApiClient
         }
 
-        function showVisualForm() {
-            view.querySelector(".visualLoginForm").classList.remove("hide"), view.querySelector(".manualLoginForm").classList.add("hide")
-        }
         view.querySelector("#divUsers").addEventListener("click", function(e) {
             var card = dom.parentWithClass(e.target, "card"),
                 cardContent = card ? card.querySelector(".cardContent") : null;
-            if (cardContent) {
+            if (cardContent && !card.disabled) {
                 var context = view,
-                    id = cardContent.getAttribute("data-userid"),
-                    name = cardContent.getAttribute("data-username"),
-                    haspw = cardContent.getAttribute("data-haspw");
-                "manual" == id ? (context.querySelector("#txtManualName").value = "", showManualForm(context)) : "false" == haspw ? authenticateUserByName(context, getApiClient(), name, "") : (context.querySelector("#txtManualName").value = name, context.querySelector("#txtManualPassword").value = "", showManualForm(context, true))
+                    id = cardContent.getAttribute("data-userid");
+                authenticateUserByToken(context, getApiClient(), id, token);
+            } else {
+                require(["controllers/myprofile"], function (myProfilePage) {
+                    new myProfilePage(view, Object.assign(params, {
+                        onSaveSuccessful: function () {
+                            var apiClient = getApiClient();
+
+                            apiClient.getUsers({ AccessToken: token }).then(function (r) { return r.json() }).then(function (users) {
+                                loadUserList(view, apiClient, users);
+                                loading.hide();
+                                showVisualForm(view);
+                                view.querySelector(".visualLoginForm").classList.remove("hide");
+                                view.querySelector(".userProfileSettingsForm").classList.add("hide");
+                                focusManager.focus(view.querySelector("#divUsers button:first-child"));
+                            }).catch(function (e) {
+                                (showManualForm(view, !1), loading.hide())
+                            });
+                        },
+                        backAction: function () {
+                            loading.hide();
+                            view.querySelector(".visualLoginForm").classList.remove("hide");
+                            view.querySelector(".userProfileSettingsForm").classList.add("hide");
+                            focusManager.focus(view.querySelector("#divUsers button:first-child"));
+                        }
+                    }));
+
+                    view.querySelector(".visualLoginForm").classList.add("hide");
+                    view.querySelector(".userProfileSettingsForm").classList.remove("hide");
+                    focusManager.focus(view.querySelector(".userProfileSettingsForm .txtName"));
+                })
             }
         }), view.querySelector(".manualLoginForm").addEventListener("submit", function(e) {
             appSettings.enableAutoLogin(view.querySelector(".chkRememberLogin").checked);
             var apiClient = getApiClient();
-            return authenticateUserByName(view, apiClient, view.querySelector("#txtManualName").value, view.querySelector("#txtManualPassword").value), e.preventDefault(), !1
+            return authenticateAccount(view, apiClient, view.querySelector("#txtManualEmail").value, view.querySelector("#txtManualPassword").value), e.preventDefault(), !1
         }), view.querySelector(".btnForgotPassword").addEventListener("click", function() {
             Dashboard.navigate("forgotpassword.html")
         }), view.addEventListener("viewshow", function(e) {
             loading.show();
             var apiClient = getApiClient();
-            apiClient.getPublicUsers().then(function(users) {
-                if (users.length) {
-                    if (users[0].EnableAutoLogin) {
-                        authenticateUserByName(view, apiClient, users[0].Name, "");
-                    } else {
-                        showVisualForm();
-                        loadUserList(view, apiClient, users);
-                    }
-                } else {
-                    view.querySelector("#txtManualName").value = "";
-                    showManualForm(view, false);
-                }
 
-            }).finally(function () {
-                loading.hide();
-                document.querySelector(".backgroundContainer").style.backgroundColor = "rgba(0, 0, 0, .75)";
+            apiClient.isAuthenticateAccount().then(function (t) {
+                token = t, token ? apiClient.getUsers({ AccessToken: token }).then(function (r) { return r.json() }).then(function (users) {
+                    loadUserList(view, apiClient, users);
+                    loading.hide();
+                    showVisualForm(view);
+                }).catch(function (e) {
+                    (showManualForm(view, !1), loading.hide())
+                }) : (showManualForm(view, !1), loading.hide());
+            }).catch(function (e) {
+                (showManualForm(view, !1), loading.hide())
             });
 
             apiClient.getJSON(apiClient.getUrl("Branding/Configuration")).then(function(options) {

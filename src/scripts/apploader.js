@@ -1,6 +1,16 @@
 ! function() {
     "use strict";
 
+    var exLog = console.log;
+    var logEl = document.querySelector("#log");
+    if (logEl) {
+        console.log = function (msg) {
+            exLog.apply(this, arguments);
+            logEl.innerText = logEl.innerText + msg + "\n";
+            logEl.scrollTo(0, logEl.scrollHeight);
+        }
+    }
+
     function loadApp() {
         var script = document.createElement("script"),
             src = "./scripts/site.js";

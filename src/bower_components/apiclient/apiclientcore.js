@@ -213,12 +213,14 @@ define(["events", "appStorage"], function(events, appStorage) {
     }
     ApiClient.prototype.appName = function() {
         return this._appName
-    }, ApiClient.prototype.setRequestHeaders = function(headers) {
+    }, ApiClient.prototype.setRequestHeaders = function (headers) {
+        var account = JSON.parse(appStorage.getItem("account-" + this.serverId()));
         var currentServerInfo = this.serverInfo(),
             appName = this._appName,
             accessToken = currentServerInfo.AccessToken,
+            accountAccessToken = account && account.AccessToken || null,
             values = [];
-        if (appName && values.push('Client="' + appName + '"'), this._deviceName && values.push('Device="' + this._deviceName + '"'), this._deviceId && values.push('DeviceId="' + this._deviceId + '"'), this._appVersion && values.push('Version="' + this._appVersion + '"'), accessToken && values.push('Token="' + accessToken + '"'), values.length) {
+        if (appName && values.push('Client="' + appName + '"'), this._deviceName && values.push('Device="' + this._deviceName + '"'), this._deviceId && values.push('DeviceId="' + this._deviceId + '"'), this._appVersion && values.push('Version="' + this._appVersion + '"'), accessToken && values.push('Token="' + accessToken + '"'), accountAccessToken && values.push('AccountToken="' + accountAccessToken + '"'), values.length) {
             var auth = "MediaBrowser " + values.join(", ");
             headers["X-Emby-Authorization"] = auth
         }
@@ -313,6 +315,76 @@ define(["events", "appStorage"], function(events, appStorage) {
             }).then(done, done)
         }
         return done(), Promise.resolve()
+    }, ApiClient.prototype.isAuthenticateAccount = function () {
+        var account = JSON.parse(appStorage.getItem("account-" + this.serverId()));
+        if (account) {
+            var url = this.getUrl("Sessions/IsValidAccountToken"),
+                instance = this;
+            var postData = {
+                ServerId: this.serverId(),
+                AccessToken: account.AccessToken
+            };
+
+            return new window.Promise(function (resolve, reject) {
+                return instance.ajax({
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify(postData),
+                    dataType: "json",
+                    contentType: "application/json"
+                }).then(function (response) {
+                    if (!response) {
+                        appStorage.removeItem("account-" + this.serverId());
+                        reject();
+                    }
+                    resolve(account.AccessToken);
+                }).catch(reject);
+            });
+        } else {
+            return window.Promise.reject();
+        }
+    }, ApiClient.prototype.authenticateAccount = function (email, password) {
+        if (!email || !password) return window.Promise.reject();
+        var url = this.getUrl("Users/AuthenticateAccount"),
+            instance = this;
+        return new window.Promise(function (resolve, reject) {
+            var postData = {
+                Email: email.toLowerCase(),
+                Password: password
+            };
+            instance.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(postData),
+                dataType: "json",
+                contentType: "application/json"
+            }).then(function (result) {
+                appStorage.setItem("account-" + result.ServerId, JSON.stringify(Object.assign(result.Account, { AccessToken: result.AccessToken })));
+                resolve(result);
+            }, reject)
+        })
+    }, ApiClient.prototype.authenticateUserByToken = function (guid, accessToken) {
+        if (!guid || !accessToken) return Promise.reject("Invalid Guid or AccessToken");
+        var url = this.getUrl("Users/AuthenticateByToken"),
+            instance = this;
+        return new Promise(function (resolve, reject) {
+            var postData = {
+                Guid: guid,
+                AccessToken: accessToken || ""
+            };
+            instance.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(postData),
+                dataType: "json",
+                contentType: "application/json"
+            }).then(function (result) {
+                var afterOnAuthenticated = function () {
+                    redetectBitrate(instance), resolve(result)
+                };
+                instance.onAuthenticated ? instance.onAuthenticated(instance, result).then(afterOnAuthenticated) : afterOnAuthenticated()
+            }, reject)
+        })
     }, ApiClient.prototype.authenticateUserByName = function(name, password) {
         if (!name) return Promise.reject();
         var url = this.getUrl("Users/authenticatebyname"),
@@ -1000,7 +1072,7 @@ define(["events", "appStorage"], function(events, appStorage) {
         if (!userId) throw new Error("null userId");
         if (!imageType) throw new Error("null imageType");
         if (!file) throw new Error("File must be an image.");
-        if ("image/png" !== file.type && "image/jpeg" !== file.type && "image/jpeg" !== file.type) throw new Error("File must be an image.");
+        if (file.type.search(/image\/(png|jpg|jpeg|gif|svg)/gi) === -1) throw new Error("File must be an image.");
         var instance = this;
         return new Promise(function(resolve, reject) {
             var reader = new FileReader;
@@ -1088,9 +1160,13 @@ define(["events", "appStorage"], function(events, appStorage) {
             url: url,
             dataType: "json"
         }, !1)
-    }, ApiClient.prototype.getUsers = function(options) {
-        var url = this.getUrl("users", options || {});
-        return this.getJSON(url)
+    }, ApiClient.prototype.getUsers = function (options) {
+        return options && options.AccessToken ? this.ajax({
+            type: "POST",
+            url: this.getUrl("users"),
+            data: JSON.stringify(options),
+            contentType: "application/json"
+        }) : this.getJSON(this.getUrl("users", options || {}))
     }, ApiClient.prototype.getParentalRatings = function() {
         var url = this.getUrl("Localization/ParentalRatings");
         return this.getJSON(url)
@@ -1190,15 +1266,24 @@ define(["events", "appStorage"], function(events, appStorage) {
             contentType: "application/json"
         })
     }, ApiClient.prototype.createUser = function(name) {
-        var url = this.getUrl("Users/New");
-        return this.ajax({
-            type: "POST",
-            url: url,
-            data: {
-                Name: name
-            },
-            dataType: "json"
-        })
+        var account = JSON.parse(appStorage.getItem("account-" + this.serverId()));
+
+        if (!name || !name.match(/^[A-Za-z]+$/)) {
+            return Promise.reject("Nome Inválido");
+        } else if (!account) {
+            return Promise.reject("Invalid AccessToken");
+        } else {
+            var url = this.getUrl("Users/New");
+            return this.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    Name: name,
+                    AccessToken: account.AccessToken,
+                },
+                dataType: "json"
+            })
+        }
     }, ApiClient.prototype.updateUser = function(user) {
         if (!user) throw new Error("null user");
         var url = this.getUrl("Users/" + user.Id);
@@ -1206,6 +1291,15 @@ define(["events", "appStorage"], function(events, appStorage) {
             type: "POST",
             url: url,
             data: JSON.stringify(user),
+            contentType: "application/json"
+        })
+    }, ApiClient.prototype.updateUserMaxParentalRatingPolicy = function(userId, parentalRating) {
+        if (!userId) throw new Error("null userId");
+        var url = this.getUrl("Users/" + userId + "/Policy/MaxParentalRating");
+        return this.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(parentalRating),
             contentType: "application/json"
         })
     }, ApiClient.prototype.updateUserPolicy = function(userId, policy) {

@@ -1,4 +1,4 @@
-define([], function() {
+define(["emby-scroller"], function() {
     "use strict";
 
     function processForgotPasswordResult(result) {
@@ -18,14 +18,16 @@ define([], function() {
             })
         }
     }
-    return function(view, params) {
+    return function (view, params) {
+        document.querySelector(".backgroundContainer").style.backgroundColor = null;
+
         function onSubmit(e) {
             return ApiClient.ajax({
                 type: "POST",
                 url: ApiClient.getUrl("Users/ForgotPassword"),
                 dataType: "json",
                 data: {
-                    EnteredUsername: view.querySelector("#txtName").value
+                    EnteredUsername: view.querySelector("#txtEmail").value
                 }
             }).then(processForgotPasswordResult), e.preventDefault(), !1
         }

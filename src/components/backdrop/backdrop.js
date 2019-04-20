@@ -54,8 +54,12 @@ define(['browser', 'connectionManager', 'playbackManager', 'dom', 'css!./style']
                     existingBackdropImage.parentNode.removeChild(existingBackdropImage);
                 }
                 internalBackdrop(true);
+                makeBlurredCopy();
                 return;
             }
+
+            document.querySelector(".backdropContainerCopy").style.opacity = 0;
+            makeBlurredCopy();
 
             var onAnimationComplete = function () {
                 dom.removeEventListener(backdropImage, dom.whichAnimationEvent(), onAnimationComplete, {
@@ -67,6 +71,8 @@ define(['browser', 'connectionManager', 'playbackManager', 'dom', 'css!./style']
                 if (existingBackdropImage && existingBackdropImage.parentNode) {
                     existingBackdropImage.parentNode.removeChild(existingBackdropImage);
                 }
+
+                document.querySelector(".backdropContainerCopy").style.opacity = null;
             };
 
             dom.addEventListener(backdropImage, dom.whichAnimationEvent(), onAnimationComplete, {
@@ -124,6 +130,8 @@ define(['browser', 'connectionManager', 'playbackManager', 'dom', 'css!./style']
             hasExternalBackdrop = false;
         }
         internalBackdrop(false);
+
+        makeBlurredCopy();
     }
 
     var backgroundContainer;

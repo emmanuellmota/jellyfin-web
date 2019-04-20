@@ -1,3 +1,69 @@
+@font-face {
+    font-family: 'Netflix Sans';
+    font-weight: 100;
+    font-display: optional;
+    src: url(../fonts/netflix-sans/NetflixSans-Thin-Opt.woff2) format('woff2'),url(../fonts/netflix-sans/NetflixSans-Thin-Opt.woff) format('woff')
+}
+
+@font-face {
+    font-family: 'Netflix Sans';
+    font-weight: 300;
+    font-display: optional;
+    src: url(../fonts/netflix-sans/NetflixSans-Light-Opt.woff2) format('woff2'),url(../fonts/netflix-sans/NetflixSans-Light-Opt.woff) format('woff')
+}
+
+@font-face {
+    font-family: 'Netflix Sans';
+    font-weight: 400;
+    font-display: optional;
+    src: url(../fonts/netflix-sans/NetflixSans-Regular-Opt.woff2) format('woff2'),url(../fonts/netflix-sans/NetflixSans-Regular-Opt.woff) format('woff')
+}
+
+@font-face {
+    font-family: 'Netflix Sans';
+    font-weight: 700;
+    font-display: optional;
+    src: url(../fonts/netflix-sans/NetflixSans-Medium-Opt.woff2) format('woff2'),url(../fonts/netflix-sans/NetflixSans-Medium-Opt.woff) format('woff')
+}
+
+@font-face {
+    font-family: 'Netflix Sans';
+    font-weight: 800;
+    font-display: optional;
+    src: url(../fonts/netflix-sans/NetflixSans-Bold-Opt.woff2) format('woff2'),url(../fonts/netflix-sans/NetflixSans-Bold-Opt.woff) format('woff')
+}
+
+@font-face {
+    font-family: 'Netflix Sans';
+    font-weight: 900;
+    font-display: optional;
+    src: url(../fonts/netflix-sans/NetflixSans-Black-Opt.woff2) format('woff2'),url(../fonts/netflix-sans/NetflixSans-Black-Opt.woff) format('woff')
+}
+
+html {
+    font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body.hideMainDrawer:not([class*="Document"]) .backdropContainer {
+    background-image: url(/web/img/movies_wall.jpg);
+}
+
+.emby-button {
+    transition: all .3s;
+}
+
+.emby-button.raised:focus {
+    background: #4a4a4a;
+}
+
+.emby-button.button-submit:focus {
+    background: #00c2ff;
+}
+
+*:focus {
+    transform: perspective(1px) scale(1.048) !important;
+}
+
 .scrollFrameY > .scrollSlider {
     -webkit-box-flex: 1;
     -webkit-flex-grow: 1;
@@ -5,22 +71,48 @@
     width: 100%
 }
 
-.scrollFrameY {
-    overflow: hidden
+.emby-scroller {
+    overflow: visible !important;
 }
 
 .pageTitleWithDefaultLogo {
     margin-right: 14px !important;
 }
 
-.backdropContainer {
-    background-image: url("/web/img/movies_wall.jpg");
+body[class*="Document"] .backdropContainer {
     background-size: cover;
+    background-color: #313131 !important;
+    background-image: linear-gradient(15deg, #060608 0%, #274359 45%, #162633 70%, #060608 99%, #060608 100%);
+}
+
+.libraryDocument .backgroundContainer:not(.withBackdrop) {
+    background-color: transparent;
 }
 
 .backgroundContainer {
-    background-color: #000;
     transition: background .75s;
+    background-color: #101010;
+}
+
+.skinHeader .backdropContainerCopy * {
+    animation: none;
+    transition: none;
+}
+
+.skinHeader .backdropContainerCopy {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.skinHeader .backdropContainerCopy .backdropContainer {
+    width: 100vw;
+    height: 100vh;
+}
+
+.skinHeader .backdropContainerCopy .backdropContainer:nth-child(2) {
+    filter: blur(2em);
 }
 
 .layout-tv body {
@@ -49,7 +141,7 @@
     flex-direction: column;
 }
 
-#loginPage .manualLoginForm {
+#loginPage .manualLoginForm, #forgotPasswordPage .forgotPasswordForm {
     padding: 32px;
     border-radius: 4px;
     background-color: #000;
@@ -65,7 +157,6 @@
     width: 100%;
     border-radius: 3px;
     margin-bottom: .5em;
-    transition: background-color .3s, transform .3s;
     transform-origin: 50% 0;
 }
 
@@ -76,10 +167,33 @@
 
 #loginPage .visualLoginForm .card .cardBox {
     display: flex;
-    background-color: rgba(255, 255, 255, .05);
+    background-color: rgba(255, 255, 255, .1);
     margin: .2em;
     transition: background .3s;
     transform-origin: 50% 0;
+}
+
+#loginPage .visualLoginForm .createAccount .cardBox {
+    display: flex;
+    height: 5em;
+    align-items: center;
+    justify-content: center;
+}
+
+#loginPage .visualLoginForm .createAccount .cardBox::before {
+    content: "+";
+    font-weight: 100;
+    font-size: 3.2em;
+    color: #586c7b;
+}
+
+#loginPage .visualLoginForm .createAccount .cardBox::after {
+    content: "Adicionar perfil";
+    margin: 0 .5em;
+    font-weight: 400;
+    font-size: x-large;
+    color: #586c7b;
+    margin-top: 2px;
 }
 
 #loginPage .visualLoginForm .card:focus .cardBox {
@@ -121,24 +235,48 @@
     width: 5em;
 }
 
+#loginPage .newImageForm .title {
+    text-align: center;
+}
+
+.userImagePage .fldImage {
+    position: relative;
+    width: 10em;
+    height: 10em;
+    margin-top: 1em;
+    padding: 0;
+    background-color: #292929;
+    background-image: url(../img/logindefault.png);
+    background-size: contain;
+}
+
+.userImagePage .fldImage::after {
+    content: "\e3c9";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: .3em;
+    border-top-right-radius: 6px;
+    background-color: #000;
+    font-size: 1.5em;
+}
+
+.userImagePage .fldImage img {
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .skinHeader {
     background: transparent !important;
+    transform: translateY(0) !important;
     transition: transform 140ms linear, box-shadow .2s ease-out !important;
     overflow: hidden;
 }
 
 .skinHeader.withShadow {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.skinHeader:before {
-    content: " ";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 0;
 }
 
 .skinHeader:after {
@@ -168,7 +306,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    filter: blur(40px) saturate(200%);
+    filter: blur(3em) saturate(200%);
     overflow: hidden;
 }
 
@@ -186,6 +324,18 @@
     margin-left: 2%;
     z-index: 5 !important;
     padding: 1.5em 0 1em !important;
+}
+
+.skinHeader.osdHeader .tabs, .skinHeader.headroomDisabled .tabs {
+    display: none;
+}
+
+.mainDrawer {
+    margin-top: 5em !important;
+}
+
+.mainDrawer > div.mainDrawer-scrollContainer {
+    margin-top: 0 !important;
 }
 
 .tabs {
@@ -221,9 +371,8 @@
     transition: .2s cubic-bezier(0.62, 0, 0.25, 1);
 }
 
-.headerBackButton {
-    position: absolute !important;
-    top: 62px;
+.skinHeader:not(.osdHeader) .headerBackButton {
+    margin: 1px;
 }
 
 .headerTabs {
@@ -239,6 +388,7 @@
 
 .pageTitleWithDefaultLogo {
     background-image: url("/web/img/logolight.svg");
+    cursor: pointer;
 }
 
 .emby-input, .emby-textarea {
@@ -249,4 +399,83 @@
     will-change: border, transform;
     transition: border .3s, transform .3s;
     transform-origin: 50% 0;
+}
+
+.emby-select {
+    border: .2em solid transparent;
+    background-origin: border-box;
+    will-change: border, transform;
+    transition: border .3s, transform .3s;
+    transform-origin: 50% 0;
+}
+
+.headerTop {
+    margin-right: 2%;
+    margin-left: 2%;
+    z-index: 5 !important;
+    padding-bottom: 1em !important;
+}
+
+.tabs {
+    position: relative;
+    display: flex;
+    height: 30px;
+    box-sizing: border-box;
+    font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.tabs > a {
+    padding: 0 15px !important;
+    background: none !important;
+    color: rgba(255, 255, 255, .5);
+    transition: color .3s;
+}
+
+.tabs > a:hover, .tabs > a.selected {
+    color: #fff;
+}
+
+.tabs > a > i {
+    display: none;
+}
+
+.tabs > .line {
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background-color: #fff;
+    transition: .2s cubic-bezier(0.62, 0, 0.25, 1);
+}
+
+.pageTitleWithLogo {
+    width: 8em;
+    min-width: 8em;
+}
+
+.libraryPage {
+    padding-top: 5em !important;
+}
+
+.headerHomeButton {
+    display: none;
+}
+
+@media (max-width: 60em) {
+    .libraryDocument .mainDrawerButton {
+        display: block
+    }
+}
+
+@media all and (min-width: 940px) {
+    .libraryDocument .mainDrawerButton {
+        display: none !important;
+    }
+}
+
+@media all and (max-width: 940px) {
+    .headerTop .tabs {
+        opacity: 0;
+    }
 }
