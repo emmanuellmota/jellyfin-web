@@ -16,6 +16,7 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
         });
 
         var menuItems = options.map(function (o) {
+
             var opt = {
                 name: o.name,
                 id: o.bitrate,
@@ -38,19 +39,25 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
         return actionsheet.show({
             items: menuItems,
             positionTo: btn
+
         }).then(function (id) {
             var bitrate = parseInt(id);
             if (bitrate !== selectedId) {
+
                 playbackManager.setMaxStreamingBitrate({
+
                     enableAutomaticBitrateDetection: bitrate ? false : true,
                     maxBitrate: bitrate
+
                 }, player);
             }
         });
     }
 
     function showRepeatModeMenu(player, btn) {
+
         var menuItems = [];
+
         var currentValue = playbackManager.getRepeatMode(player);
 
         menuItems.push({
@@ -58,7 +65,6 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
             id: 'RepeatAll',
             selected: currentValue === 'RepeatAll'
         });
-
         menuItems.push({
             name: globalize.translate('RepeatOne'),
             id: 'RepeatOne',
@@ -74,7 +80,9 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
         return actionsheet.show({
             items: menuItems,
             positionTo: btn
+
         }).then(function (mode) {
+
             if (mode) {
                 playbackManager.setRepeatMode(mode, player);
             }
@@ -82,14 +90,15 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
     }
 
     function getQualitySecondaryText(player) {
+
         var state = playbackManager.getPlayerState(player);
+
         var isAutoEnabled = playbackManager.enableAutomaticBitrateDetection(player);
         var currentMaxBitrate = playbackManager.getMaxStreamingBitrate(player);
 
         var videoStream = playbackManager.currentMediaSource(player).MediaStreams.filter(function (stream) {
             return stream.Type === "Video";
         })[0];
-
         var videoWidth = videoStream ? videoStream.Width : null;
 
         var options = qualityoptions.getVideoQualityOptions({
@@ -100,6 +109,7 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
         });
 
         var menuItems = options.map(function (o) {
+
             var opt = {
                 name: o.name,
                 id: o.bitrate,
@@ -122,6 +132,7 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
         }
 
         selectedOption = selectedOption[0];
+
         var text = selectedOption.name;
 
         if (selectedOption.autoText) {
@@ -185,6 +196,11 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
             });
         }
 
+        menuItems.push({
+            name: globalize.translate('PlaybackSettings'),
+            id: 'playbacksettings'
+        });
+
         if (user && user.Policy.EnableVideoPlaybackTranscoding) {
             var secondaryQualityText = getQualitySecondaryText(player);
 
@@ -198,6 +214,7 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
         var repeatMode = playbackManager.getRepeatMode(player);
 
         if (supportedCommands.indexOf('SetRepeatMode') !== -1 && playbackManager.currentMediaSource(player).RunTimeTicks) {
+
             menuItems.push({
                 name: globalize.translate('RepeatMode'),
                 id: 'repeatmode',
@@ -206,23 +223,34 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
         }
 
         if (options.stats) {
+
             menuItems.push({
-                name: globalize.translate('PlaybackData'),
+                name: globalize.translate('StatsForNerds'),
                 id: 'stats',
                 asideText: null
             });
         }
 
+        menuItems.push({
+            name: globalize.translate('SubtitleSettings'),
+            id: 'subtitlesettings'
+        });
+
         return actionsheet.show({
+
             items: menuItems,
             positionTo: options.positionTo
+
         }).then(function (id) {
+
             return handleSelectedOption(id, options, player);
         });
     }
 
     function show(options) {
+
         var player = options.player;
+
         var currentItem = playbackManager.currentItem(player);
 
         if (!currentItem || !currentItem.ServerId) {
@@ -230,19 +258,45 @@ define(['connectionManager', 'actionsheet', 'datetime', 'playbackManager', 'glob
         }
 
         var apiClient = connectionManager.getApiClient(currentItem.ServerId);
+
         return apiClient.getCurrentUser().then(function (user) {
             return showWithUser(options, player, user);
         });
     }
 
+    function alertText(text) {
+
+        return new Promise(function (resolve, reject) {
+
+            require(['alert'], function (alert) {
+
+                alert(text).then(resolve);
+            });
+        });
+    }
+
+    function showSubtitleSettings(player, btn) {
+        return alertText(globalize.translate('SubtitleSettingsIntro'));
+    }
+
+    function showPlaybackSettings(player, btn) {
+        return alertText(globalize.translate('PlaybackSettingsIntro'));
+    }
+
     function handleSelectedOption(id, options, player) {
+
         switch (id) {
+
             case 'quality':
                 return showQualityMenu(player, options.positionTo);
             case 'aspectratio':
                 return showAspectRatioMenu(player, options.positionTo);
             case 'repeatmode':
                 return showRepeatModeMenu(player, options.positionTo);
+            case 'subtitlesettings':
+                return showSubtitleSettings(player, options.positionTo);
+            case 'playbacksettings':
+                return showPlaybackSettings(player, options.positionTo);
             case 'stats':
                 if (options.onOption) {
                     options.onOption('stats');
