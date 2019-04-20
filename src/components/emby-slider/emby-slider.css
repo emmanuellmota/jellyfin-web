@@ -10,7 +10,7 @@ _:-ms-input-placeholder {
     -moz-appearance: none;
     -ms-appearance: none;
     appearance: none;
-    height: 150%;/*150% is needed, else ie and edge won't display the thumb properly*/
+    height: 150%; /*150% is needed, else ie and edge won't display the thumb properly*/
     background: transparent;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -158,8 +158,6 @@ _:-ms-input-placeholder {
 }
 
 .mdl-slider-background-flex-container {
-    padding-left: 10px;
-    padding-right: 10px;
     width: 100%;
     box-sizing: border-box;
     margin-top: -.05em;

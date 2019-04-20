@@ -1,4 +1,4 @@
-define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryBrowser", "emby-itemscontainer", "emby-button"], function(connectionManager, listView, cardBuilder, imageLoader, libraryBrowser) {
+define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryBrowser", "emby-itemscontainer", "emby-button"], function (connectionManager, listView, cardBuilder, imageLoader, libraryBrowser) {
     "use strict";
 
     function renderItems(page, item) {
@@ -29,7 +29,7 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
             type: "MusicVideo"
         });
         var elem = page.querySelector("#childrenContent");
-        elem.innerHTML = sections.map(function(section) {
+        elem.innerHTML = sections.map(function (section) {
             var html = "",
                 sectionClass = "verticalSection";
             return "Audio" === section.type && (sectionClass += " verticalSection-extrabottompadding"), html += '<div class="' + sectionClass + '" data-type="' + section.type + '">', html += '<div class="sectionTitleContainer sectionTitleContainer-cards">', html += '<h2 class="sectionTitle sectionTitle-cards padded-left">', html += section.name, html += "</h2>", html += '<a is="emby-linkbutton" href="#" class="clearLink hide" style="margin-left:1em;vertical-align:middle;"><button is="emby-button" type="button" class="raised more raised-mini noIcon">' + Globalize.translate("ButtonMore") + "</button></a>", html += "</div>", html += '<div is="emby-itemscontainer" class="itemsContainer padded-left padded-right">', html += "</div>", html += "</div>"
@@ -49,16 +49,16 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     Limit: 10,
                     SortBy: "StartDate"
                 }, {
-                    shape: "backdrop",
-                    showTitle: !0,
-                    centerText: !0,
-                    overlayMoreButton: !0,
-                    preferThumb: !0,
-                    overlayText: !1,
-                    showAirTime: !0,
-                    showAirDateTime: !0,
-                    showChannelName: !0
-                });
+                        shape: "backdrop",
+                        showTitle: !0,
+                        centerText: !0,
+                        overlayMoreButton: !0,
+                        preferThumb: !0,
+                        overlayText: !1,
+                        showAirTime: !0,
+                        showAirDateTime: !0,
+                        showChannelName: !0
+                    });
                 break;
             case "Movie":
                 loadItems(element, item, type, {
@@ -70,13 +70,13 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     Limit: 10,
                     SortBy: "SortName"
                 }, {
-                    shape: "portrait",
-                    showTitle: !0,
-                    centerText: !0,
-                    overlayMoreButton: !0,
-                    overlayText: !1,
-                    showYear: !0
-                });
+                        shape: "portrait",
+                        showTitle: !0,
+                        centerText: !0,
+                        overlayMoreButton: !0,
+                        overlayText: !1,
+                        showYear: !0
+                    });
                 break;
             case "MusicVideo":
                 loadItems(element, item, type, {
@@ -88,11 +88,11 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     Limit: 10,
                     SortBy: "SortName"
                 }, {
-                    shape: "portrait",
-                    showTitle: !0,
-                    centerText: !0,
-                    overlayPlayButton: !0
-                });
+                        shape: "portrait",
+                        showTitle: !0,
+                        centerText: !0,
+                        overlayPlayButton: !0
+                    });
                 break;
             case "Trailer":
                 loadItems(element, item, type, {
@@ -104,11 +104,11 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     Limit: 10,
                     SortBy: "SortName"
                 }, {
-                    shape: "portrait",
-                    showTitle: !0,
-                    centerText: !0,
-                    overlayPlayButton: !0
-                });
+                        shape: "portrait",
+                        showTitle: !0,
+                        centerText: !0,
+                        overlayPlayButton: !0
+                    });
                 break;
             case "Series":
                 loadItems(element, item, type, {
@@ -120,11 +120,11 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     Limit: 10,
                     SortBy: "SortName"
                 }, {
-                    shape: "portrait",
-                    showTitle: !0,
-                    centerText: !0,
-                    overlayMoreButton: !0
-                });
+                        shape: "portrait",
+                        showTitle: !0,
+                        centerText: !0,
+                        overlayMoreButton: !0
+                    });
                 break;
             case "MusicAlbum":
                 loadItems(element, item, type, {
@@ -134,14 +134,14 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     ArtistIds: "",
                     AlbumArtistIds: ""
                 }, {
-                    shape: "square",
-                    playFromHere: !0,
-                    showTitle: !0,
-                    showYear: !0,
-                    coverImage: !0,
-                    centerText: !0,
-                    overlayPlayButton: !0
-                });
+                        shape: "square",
+                        playFromHere: !0,
+                        showTitle: !0,
+                        showYear: !0,
+                        coverImage: !0,
+                        centerText: !0,
+                        overlayPlayButton: !0
+                    });
                 break;
             case "MusicArtist":
                 loadItems(element, item, type, {
@@ -153,14 +153,14 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     Limit: 8,
                     SortBy: "SortName"
                 }, {
-                    shape: "square",
-                    playFromHere: !0,
-                    showTitle: !0,
-                    showParentTitle: !0,
-                    coverImage: !0,
-                    centerText: !0,
-                    overlayPlayButton: !0
-                });
+                        shape: "square",
+                        playFromHere: !0,
+                        showTitle: !0,
+                        showParentTitle: !0,
+                        coverImage: !0,
+                        centerText: !0,
+                        overlayPlayButton: !0
+                    });
                 break;
             case "Episode":
                 loadItems(element, item, type, {
@@ -172,12 +172,12 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     Limit: 6,
                     SortBy: "SortName"
                 }, {
-                    shape: "backdrop",
-                    showTitle: !0,
-                    showParentTitle: !0,
-                    centerText: !0,
-                    overlayPlayButton: !0
-                });
+                        shape: "backdrop",
+                        showTitle: !0,
+                        showParentTitle: !0,
+                        centerText: !0,
+                        overlayPlayButton: !0
+                    });
                 break;
             case "Audio":
                 loadItems(element, item, type, {
@@ -188,16 +188,16 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
                     AlbumArtistIds: "",
                     SortBy: "AlbumArtist,Album,SortName"
                 }, {
-                    playFromHere: !0,
-                    action: "playallfromhere",
-                    smallIcon: !0,
-                    artist: !0
-                })
+                        playFromHere: !0,
+                        action: "playallfromhere",
+                        smallIcon: !0,
+                        artist: !0
+                    })
         }
     }
 
     function loadItems(element, item, type, query, listOptions) {
-        query = getQuery(query, item), getItemsFunction(query, item)(query.StartIndex, query.Limit, query.Fields).then(function(result) {
+        query = getQuery(query, item), getItemsFunction(query, item)(query.StartIndex, query.Limit, query.Fields).then(function (result) {
             var html = "";
             if (query.Limit && result.TotalRecordCount > query.Limit) {
                 var link = element.querySelector("a");
@@ -210,7 +210,7 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
     }
 
     function getMoreItemsHref(item, type) {
-        return "Genre" == item.Type ? "list/list.html?type=" + type + "&genreId=" + item.Id + "&serverId=" + item.ServerId : "MusicGenre" == item.Type ? "list/list.html?type=" + type + "&musicGenreId=" + item.Id + "&serverId=" + item.ServerId : "Studio" == item.Type ? "list/list.html?type=" + type + "&studioId=" + item.Id + "&serverId=" + item.ServerId : "MusicArtist" == item.Type ? "list/list.html?type=" + type + "&artistId=" + item.Id + "&serverId=" + item.ServerId : "Person" == item.Type ? "list/list.html?type=" + type + "&personId=" + item.Id + "&serverId=" + item.ServerId : "list/list.html?type=" + type + "&parentId=" + item.Id + "&serverId=" + item.ServerId
+        return "Genre" == item.Type ? "list.html?type=" + type + "&genreId=" + item.Id + "&serverId=" + item.ServerId : "MusicGenre" == item.Type ? "list.html?type=" + type + "&musicGenreId=" + item.Id + "&serverId=" + item.ServerId : "Studio" == item.Type ? "list.html?type=" + type + "&studioId=" + item.Id + "&serverId=" + item.ServerId : "MusicArtist" == item.Type ? "list.html?type=" + type + "&artistId=" + item.Id + "&serverId=" + item.ServerId : "Person" == item.Type ? "list.html?type=" + type + "&personId=" + item.Id + "&serverId=" + item.ServerId : "list.html?type=" + type + "&parentId=" + item.Id + "&serverId=" + item.ServerId
     }
 
     function addCurrentItemToQuery(query, item) {
@@ -232,7 +232,7 @@ define(["connectionManager", "listView", "cardBuilder", "imageLoader", "libraryB
 
     function getItemsFunction(options, item) {
         var query = getQuery(options, item);
-        return function(index, limit, fields) {
+        return function (index, limit, fields) {
             query.StartIndex = index, query.Limit = limit, fields && (query.Fields += "," + fields);
             var apiClient = connectionManager.getApiClient(item.ServerId);
             return "MusicArtist" === query.IncludeItemTypes ? (query.IncludeItemTypes = null, apiClient.getAlbumArtists(apiClient.getCurrentUserId(), query)) : apiClient.getItems(apiClient.getCurrentUserId(), query)

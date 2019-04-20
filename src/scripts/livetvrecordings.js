@@ -1,4 +1,4 @@
-define(["layoutManager", "loading", "cardBuilder", "apphost", "imageLoader", "scripts/livetvcomponents", "listViewStyle", "emby-itemscontainer"], function(layoutManager, loading, cardBuilder, appHost, imageLoader) {
+define(["layoutManager", "loading", "cardBuilder", "apphost", "imageLoader", "scripts/livetvcomponents", "listViewStyle", "emby-itemscontainer"], function (layoutManager, loading, cardBuilder, appHost, imageLoader) {
     "use strict";
 
     function renderRecordings(elem, recordings, cardOptions, scrollX) {
@@ -23,7 +23,7 @@ define(["layoutManager", "loading", "cardBuilder", "apphost", "imageLoader", "sc
     }
 
     function renderLatestRecordings(context, promise) {
-        promise.then(function(result) {
+        promise.then(function (result) {
             renderRecordings(context.querySelector("#latestRecordings"), result.Items, {
                 showYear: !0,
                 lines: 2
@@ -32,7 +32,7 @@ define(["layoutManager", "loading", "cardBuilder", "apphost", "imageLoader", "sc
     }
 
     function renderRecordingFolders(context, promise) {
-        promise.then(function(result) {
+        promise.then(function (result) {
             renderRecordings(context.querySelector("#recordingFolders"), result.Items, {
                 showYear: !1,
                 showParentTitle: !1
@@ -45,17 +45,17 @@ define(["layoutManager", "loading", "cardBuilder", "apphost", "imageLoader", "sc
             serverId = ApiClient.serverId();
         switch (type) {
             case "latest":
-                Dashboard.navigate("list/list.html?type=Recordings&serverId=" + serverId)
+                Dashboard.navigate("list.html?type=Recordings&serverId=" + serverId)
         }
     }
-    return function(view, params, tabContent) {
+    return function (view, params, tabContent) {
         function enableFullRender() {
             return (new Date).getTime() - lastFullRender > 3e5
         }
         var foldersPromise, latestPromise, self = this,
             lastFullRender = 0;
         for (var moreButtons = tabContent.querySelectorAll(".more"), i = 0, length = moreButtons.length; i < length; i++) moreButtons[i].addEventListener("click", onMoreClick);
-        self.preRender = function() {
+        self.preRender = function () {
             enableFullRender() && (latestPromise = ApiClient.getLiveTvRecordings({
                 UserId: Dashboard.getCurrentUserId(),
                 Limit: 12,
@@ -63,7 +63,7 @@ define(["layoutManager", "loading", "cardBuilder", "apphost", "imageLoader", "sc
                 EnableTotalRecordCount: !1,
                 EnableImageTypes: "Primary,Thumb,Backdrop"
             }), foldersPromise = ApiClient.getRecordingFolders(Dashboard.getCurrentUserId()))
-        }, self.renderTab = function() {
+        }, self.renderTab = function () {
             enableFullRender() && (loading.show(), renderLatestRecordings(tabContent, latestPromise), renderRecordingFolders(tabContent, foldersPromise), lastFullRender = (new Date).getTime())
         }
     }

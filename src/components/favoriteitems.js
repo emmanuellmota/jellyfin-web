@@ -1,4 +1,4 @@
-define(["loading", "libraryBrowser", "cardBuilder", "dom", "apphost", "imageLoader", "globalize", "layoutManager", "scrollStyles", "emby-itemscontainer"], function(loading, libraryBrowser, cardBuilder, dom, appHost, imageLoader, globalize, layoutManager) {
+define(["loading", "libraryBrowser", "cardBuilder", "dom", "apphost", "imageLoader", "globalize", "layoutManager", "scrollStyles", "emby-itemscontainer"], function (loading, libraryBrowser, cardBuilder, dom, appHost, imageLoader, globalize, layoutManager) {
     "use strict";
 
     function enableScrollX() {
@@ -107,11 +107,11 @@ define(["loading", "libraryBrowser", "cardBuilder", "dom", "apphost", "imageLoad
             };
         topParentId && (options.ParentId = topParentId), isSingleSection || (options.Limit = screenWidth >= 1920 ? 10 : screenWidth >= 1440 ? 8 : 6, enableScrollX() && (options.Limit = 20));
         var promise;
-        return "MusicArtist" === section.types ? promise = ApiClient.getArtists(userId, options) : (options.IncludeItemTypes = section.types, promise = ApiClient.getItems(userId, options)), promise.then(function(result) {
+        return "MusicArtist" === section.types ? promise = ApiClient.getArtists(userId, options) : (options.IncludeItemTypes = section.types, promise = ApiClient.getItems(userId, options)), promise.then(function (result) {
             var html = "";
             if (result.Items.length) {
                 if (html += '<div class="sectionTitleContainer sectionTitleContainer-cards padded-left">', !layoutManager.tv && options.Limit && result.Items.length >= options.Limit) {
-                    html += '<a is="emby-linkbutton" href="' + ("list/list.html?serverId=" + ApiClient.serverId() + "&type=" + section.types + "&IsFavorite=true") + '" class="more button-flat button-flat-mini sectionTitleTextButton">', html += '<h2 class="sectionTitle sectionTitle-cards">', html += globalize.translate(section.name), html += "</h2>", html += '<i class="md-icon">&#xE5CC;</i>', html += "</a>"
+                    html += '<a is="emby-linkbutton" href="' + ("list.html?serverId=" + ApiClient.serverId() + "&type=" + section.types + "&IsFavorite=true") + '" class="more button-flat button-flat-mini sectionTitleTextButton">', html += '<h2 class="sectionTitle sectionTitle-cards">', html += globalize.translate(section.name), html += "</h2>", html += '<i class="md-icon">&#xE5CC;</i>', html += "</a>"
                 } else html += '<h2 class="sectionTitle sectionTitle-cards">' + globalize.translate(section.name) + "</h2>";
                 if (html += "</div>", enableScrollX()) {
                     var scrollXClass = "scrollX hiddenScrollX";
@@ -144,9 +144,9 @@ define(["loading", "libraryBrowser", "cardBuilder", "dom", "apphost", "imageLoad
         loading.show();
         var sections = getSections(),
             sectionid = getParameterByName("sectionid");
-        sectionid && (sections = sections.filter(function(s) {
+        sectionid && (sections = sections.filter(function (s) {
             return s.id === sectionid
-        })), types && (sections = sections.filter(function(s) {
+        })), types && (sections = sections.filter(function (s) {
             return -1 !== types.indexOf(s.id)
         }));
         var i, length, elem = page.querySelector(".favoriteSections");
@@ -160,7 +160,7 @@ define(["loading", "libraryBrowser", "cardBuilder", "dom", "apphost", "imageLoad
             var section = sections[i];
             elem = page.querySelector(".section" + section.id), promises.push(loadSection(elem, userId, topParentId, section, 1 === sections.length))
         }
-        Promise.all(promises).then(function() {
+        Promise.all(promises).then(function () {
             loading.hide()
         })
     }
