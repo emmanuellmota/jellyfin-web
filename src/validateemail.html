@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="apple-touch-icon" sizes="180x180" href="touchicon.png">
+
+    <!--<link rel="apple-touch-startup-image" href="css/images/iossplash.png">-->
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="msapplication-TileImage" content="touchicon144.png">
+    <meta name="msapplication-TileColor" content="#333333">
+    <meta name="theme-color" content="#101010">
+
+    <title>NeexTV - Validação de E-mail</title>
+
+    <style type="text/css">
+        body {
+            background-color: #101010;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            margin: 0;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", 'Open Sans', sans-serif;
+            text-align: center;
+        }
+
+        .skinHeader {
+            position: fixed;
+            right: 0;
+            left: 0;
+            z-index: 999;
+            top: 0;
+            border: 0;
+            display: flex;
+            flex-direction: column;
+            margin-right: 2%;
+            margin-left: 2%;
+            z-index: 5 !important;
+            padding: 1.5em 0 1em !important;
+        }
+
+        .pageTitleWithLogo {
+            align-items: center;
+            background-image: url(/web/img/logolight.svg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            height: 29.5938px;
+            margin-bottom: 0px;
+            margin-left: 8.7048px;
+            margin-right: 14px;
+            margin-top: 0px;
+            min-width: 139.277px;
+            width: 139.266px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+        }
+        ::-webkit-scrollbar-track-piece {
+            background-color: #3b3b3b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="skinHeader headroom">
+        <div class="flex align-items-center flex-grow headerTop">
+            <div class="headerLeft">
+                <h3 class="pageTitle pageTitleWithLogo pageTitleWithDefaultLogo"></h3>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <span style="display: block; font-size: 2em; margin-bottom: .5em;">Email validado com sucesso!</span>
+        <span style="color: rgba(255, 255, 255, .7);">Você pode fechar essa página e voltar à pagina de validação.</span>
+    </div>
+
+    <div class="hide">
+        <a href="whatsapp://send?text=The text to share!" data-action="share/whatsapp/share">Share via Whatsapp</a>
+        <a href="https://web.whatsapp.com/send?text=http://www.srisankaramatrimony.com/" target="_blank">Share via Whatsapp</a>
+    </div>
+
+</body>
+
+</html>

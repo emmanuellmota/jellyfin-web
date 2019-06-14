@@ -16,9 +16,9 @@ define(['connectionManager', 'cardBuilder', 'appSettings', 'dom', 'apphost', 'la
             case 4:
                 return 'latestmedia';
             case 5:
-                return 'none';
+                return '';
             case 6:
-                return 'none';
+                return '';
             default:
                 return '';
         }
@@ -30,7 +30,8 @@ define(['connectionManager', 'cardBuilder', 'appSettings', 'dom', 'apphost', 'la
 
         for (var i = 0, length = sectionCount; i < length; i++) {
 
-            var section = userSettings.get('homesection' + i) || getDefaultSection(i);
+            // var section = userSettings.get('homesection' + i) || getDefaultSection(i); // TODO: Section
+            var section = getDefaultSection(i);
 
             if (section === 'folders') {
                 section = getDefaultSection(0);

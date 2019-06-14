@@ -54,12 +54,12 @@ define(['browser', 'connectionManager', 'playbackManager', 'dom', 'css!./style']
                     existingBackdropImage.parentNode.removeChild(existingBackdropImage);
                 }
                 internalBackdrop(true);
-                makeBlurredCopy();
+                // makeBlurredCopy();
                 return;
             }
 
             document.querySelector(".backdropContainerCopy").style.opacity = 0;
-            makeBlurredCopy();
+            // makeBlurredCopy();
 
             var onAnimationComplete = function () {
                 dom.removeEventListener(backdropImage, dom.whichAnimationEvent(), onAnimationComplete, {
@@ -131,7 +131,7 @@ define(['browser', 'connectionManager', 'playbackManager', 'dom', 'css!./style']
         }
         internalBackdrop(false);
 
-        makeBlurredCopy();
+        // makeBlurredCopy();
     }
 
     var backgroundContainer;

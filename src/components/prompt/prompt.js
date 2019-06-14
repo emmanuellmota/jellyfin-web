@@ -1,4 +1,4 @@
-define(['dialogHelper', 'layoutManager', 'scrollHelper', 'globalize', 'dom', 'require', 'material-icons', 'emby-button', 'paper-icon-button-light', 'emby-input', 'formDialogStyle'], function (dialogHelper, layoutManager, scrollHelper, globalize, dom, require) {
+define(['loading', 'dialogHelper', 'layoutManager', 'scrollHelper', 'globalize', 'dom', 'require', 'material-icons', 'emby-button', 'paper-icon-button-light', 'emby-input', 'formDialogStyle'], function (loading, dialogHelper, layoutManager, scrollHelper, globalize, dom, require) {
     'use strict';
 
     function setInputProperties(dlg, options) {
@@ -9,6 +9,23 @@ define(['dialogHelper', 'layoutManager', 'scrollHelper', 'globalize', 'dom', 're
         } else {
             txtInput.setAttribute('label', options.label || '');
         }
+
+        if (options.type) {
+            txtInput.setAttribute('type', options.type);
+        }
+
+        if (options.attribute) {
+            Object.keys(options.attribute).forEach(function(key) {
+                txtInput.setAttribute(key, options.attribute[key]);
+            });
+        }
+
+        if (options.events) {
+            Object.keys(options.events).forEach(function(key) {
+                txtInput.addEventListener(key, options.events[key]);
+            });
+        }
+
         txtInput.value = options.value || '';
     }
 
@@ -54,14 +71,26 @@ define(['dialogHelper', 'layoutManager', 'scrollHelper', 'globalize', 'dom', 're
 
         dlg.querySelector('form').addEventListener('submit', function (e) {
 
-            submitValue = dlg.querySelector('#txtInput').value;
+            var input = dlg.querySelector('#txtInput');
+            input.setAttribute("disabled", true);
+            dlg.querySelector('.btnSubmit').setAttribute("disabled", true);
+            dlg.querySelector('.btnCancel').setAttribute("disabled", true);
+
+            loading.show();
+
+            submitValue = input.value;
             e.preventDefault();
             e.stopPropagation();
 
-            // Important, don't close the dialog until after the form has completed submitting, or it will cause an error in Chrome
-            setTimeout(function () {
-                dialogHelper.close(dlg);
-            }, 300);
+            var process = options.process(submitValue) || Promise.resolve();
+
+            process.finally(function () {
+                // Important, don't close the dialog until after the form has completed submitting, or it will cause an error in Chrome
+                setTimeout(function () {
+                    loading.hide();
+                    dialogHelper.close(dlg);
+                }, 300);
+            });
 
             return false;
         });

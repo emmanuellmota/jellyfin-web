@@ -1,0 +1,36 @@
+{
+  "name": "fancygrid",
+  "version": "1.7.67",
+  "description": "Repo to allow easy downloading of FancyGrid via Bower.",
+  "main": "client/fancy.min.js",
+  "keywords": [
+    "fancygrid",
+    "grid",
+    "table",
+    "javascript",
+    "grid",
+    "jquery",
+    "grid"
+  ],
+  "homepage": "https://fancygrid.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "private": false,
+  "_release": "1.7.67",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.7.67",
+    "commit": "f92f00b248962df2ff8d99119be2164268f7ec2d"
+  },
+  "_source": "https://github.com/FancyGrid/FancyGrid.git",
+  "_target": "^1.7.67",
+  "_originalSource": "fancygrid",
+  "_direct": true
+}

@@ -1,10 +1,38 @@
-define(["apphost", "connectionManager", "listViewStyle", "emby-button"], function(appHost, connectionManager) {
+define(["apphost", "connectionManager", "globalize", "loading", "listViewStyle", "emby-button"], function (appHost, connectionManager, globalize, loading) {
     "use strict";
+
+    function deleteUser() {
+        var msg = globalize.translate("DeleteUserConfirmation");
+
+        require(["confirm"], function (confirm) {
+            confirm({
+                title: globalize.translate("DeleteUser"),
+                text: msg,
+                confirmText: globalize.translate("ButtonDelete"),
+                primary: "cancel"
+            }).then(function () {
+                loading.show();
+                ApiClient.deleteUser(ApiClient.getCurrentUserId()).then(function () {
+                    Dashboard.navigate("login.html", false, "none");
+                });
+            });
+        });
+    }
 
     return function(view, params) {
         view.querySelector(".btnLogout").addEventListener("click", function() {
             Dashboard.logout();
         });
+
+        view.querySelector(".btnAccountLogout").addEventListener("click", function () {
+            Dashboard.accountLogout();
+        });
+
+        view.querySelector(".btnAccountDetails").addEventListener("click", function () {
+            Dashboard.navigate("myaccount.html", false, "none");
+        });
+
+        view.querySelector(".btnDelete").addEventListener("click", deleteUser);
 
         view.addEventListener("viewshow", function() {
             var page = this;
@@ -40,6 +68,10 @@ define(["apphost", "connectionManager", "listViewStyle", "emby-button"], functio
                     page.querySelector(".adminSection").classList.add("hide");
                 }
             });
-        })
+            document.body.classList.add("hideBackgroundContainer");
+        }), view.addEventListener("viewbeforehide", function () {
+            document.body.classList.remove("hideBackgroundContainer");
+            document.querySelector(".backdropContainer").style.backgroundImage = null;
+        });
     }
 });

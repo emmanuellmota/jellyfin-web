@@ -399,6 +399,12 @@ define(['loading', 'globalize', 'events', 'viewManager', 'layoutManager', 'skinM
             return;
         }
 
+        if (route.needAccount && !apiClient.getAccount() || route.needAccount === "reseller" && apiClient.getAccount().GroupId === 1) {
+            console.log('appRouter - route does not allow anonymous access, redirecting to login');
+            beginConnectionWizard();
+            return;
+        }
+
         if (shouldExitApp) {
             if (appHost.supports('exit')) {
                 appHost.exit();
@@ -407,7 +413,7 @@ define(['loading', 'globalize', 'events', 'viewManager', 'layoutManager', 'skinM
             return;
         }
 
-        if (apiClient && apiClient.isLoggedIn()) {
+        if (apiClient && apiClient.isLoggedIn() && !route.needAccount) {
 
             console.log('appRouter - user is authenticated');
 
@@ -609,7 +615,7 @@ define(['loading', 'globalize', 'events', 'viewManager', 'layoutManager', 'skinM
             resolve();
         }
 
-        setTimeout(makeBlurredCopy, 800);
+        // setTimeout(makeBlurredCopy, 800);
     });
 
     var currentRouteInfo;

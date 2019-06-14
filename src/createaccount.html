@@ -1,0 +1,70 @@
+<div id="createAccountPage" data-role="page" class="page userImagePage" style="padding-top: 5em" data-backbutton="false" data-header="hide">
+
+    <div class="padded-left padded-right">
+
+        <form class="createAccountForm view-centered hide">
+
+            <div is="emby-scroller" class="scrollFrameY flex flex-grow" data-mousewheel="true" data-horizontal="false" data-centerfocus="true">
+
+                <div class="scrollSlider flex flex-grow flex-direction-column padded-left padded-right" style="justify-content: center">
+
+                    <h1 class="keep" style="margin-top:1em;text-align: left;">Criar Conta</h1>
+
+                    <div style="height:0; overflow: hidden;"><input type="text" name="fakeusernameremembered" tabindex="-1" /><input type="password" name="fakepasswordremembered" tabindex="-1" /></div>
+
+                    <div class="inputContainer keep">
+                        <input is="emby-input" type="email" id="txtEmail" required="required" label="E-mail" style="text-transform: lowercase;" />
+                    </div>
+
+                    <section class="keep">
+                        <div>
+                            <div id="emailLoader" class="loader"></div>
+                            <span>Enviamos um e-mail para sua caixa postal, siga as instuções contidas nele para validar a sua conta, caso não tenha rebido, clique <a href="#">aqui</a> para enviarmos novamente.</span>
+                        </div>
+                    </section>
+
+                    <div class="inputContainer">
+                        <input is="emby-input" id="txtPassword" required="required" type="password" label="${LabelPassword}" />
+                    </div>
+
+                    <div class="inputContainer">
+                        <input is="emby-input" id="txtConfirmPassword" required="required" type="password" label="Confirmar sua senha" />
+                    </div>
+
+                    <div class="inputContainer keep">
+                        <input is="emby-input" id="txtMobile" required="required" type="tel" label="Celular" placeholder="(99) 99999-9999" />
+                    </div>
+
+                    <section class="keep">
+                        <input is="emby-input" id="txtMobileCode" type="tel" placeholder="999-999" style="margin-bottom: 1.8em !important;" />
+                        <div>
+                            <div id="mobileLoader" class="loader collapsed"></div>
+                            <span style="width: 100%;">Digite o código de 6 dígitos enviado para o seu telefone, caso<br />não tenha recebido, clique <a href="#">aqui</a> para enviarmos outro código.</span>
+                        </div>
+                        <div style="display: block; margin-top: 2.5em;">
+                            <span style="margin: 2em auto 0 auto; color: #F44336; font-size: 1.1em;">Não feche essa página antes da validação ser concluída!</span>
+                        </div>
+                    </section>
+
+                    <div class="inputContainer">
+                        <input style="text-transform: uppercase;" is="emby-input" id="txtAccessCode" required="required" type="text" label="Código de Acesso" />
+                    </div>
+
+                    <br />
+
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>Cadastrar</span>
+                    </button>
+
+                    <br />
+                    <br />
+
+                    <div id='recaptcha' class="g-recaptcha" data-sitekey="6Lf_B6IUAAAAAKlHQAKfuFksa96zjN1bqmj_RYRx"></div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+</div>

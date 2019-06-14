@@ -14,6 +14,10 @@ define(["focusManager", "searchFields", "searchResults", "events"], function(foc
                 parentId: params.parentId,
                 collectionType: params.collectionType
             }), events.on(self.searchFields, "search", onSearch))
+            document.body.classList.add("hideBackgroundContainer");
+        }), view.addEventListener("viewbeforehide", function () {
+            document.body.classList.remove("hideBackgroundContainer");
+            document.querySelector(".backdropContainer").style.backgroundImage = null;
         }), view.addEventListener("viewdestroy", function() {
             self.searchFields && (self.searchFields.destroy(), self.searchFields = null), self.searchResults && (self.searchResults.destroy(), self.searchResults = null)
         })

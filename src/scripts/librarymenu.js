@@ -641,9 +641,7 @@ define(["dom", "layoutManager", "inputManager", "connectionManager", "events", "
     function updateMainSelectedTab() {
         var tabs = document.querySelector(".skinHeader .headerTop .tabs");
 
-        selectTab(tabs, Array.from(tabs.querySelectorAll('a')).findIndex(function (e) {
-            return location.href.indexOf(e.href.replace(/(.*web\/)(.*)(html.*)/, "$2html")) >= 0;
-        }));
+        selectTab(tabs, Array.from(tabs.querySelectorAll("a")).findIndex(function (a) { return a.href.indexOf(location.hash.replace(/^#\!/g, "")) >= 0 }));
     }
 
     function selectTab(tabs, index, init) {

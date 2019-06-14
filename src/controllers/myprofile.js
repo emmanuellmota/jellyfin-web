@@ -269,5 +269,12 @@ define(["loading", "libraryMenu", "apphost", "emby-button", 'material-icons'], f
         view.querySelector(".uploadUserImage").addEventListener("change", function (evt) {
             setFiles(view, evt.target.files);
         });
+        view.addEventListener("viewshow", function() {
+            document.body.classList.add("hideBackgroundContainer");
+        });
+        view.addEventListener("viewbeforehide", function () {
+            document.body.classList.remove("hideBackgroundContainer");
+            document.querySelector(".backdropContainer").style.backgroundImage = null;
+        });
     };
 });

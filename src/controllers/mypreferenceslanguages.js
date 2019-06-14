@@ -14,11 +14,14 @@ define(["playbackSettings", "userSettingsBuilder", "dom", "globalize", "loading"
                 userSettings: userSettings,
                 enableSaveButton: !1,
                 enableSaveConfirmation: !1
-            })
+            });
+            document.body.classList.add("hideBackgroundContainer");
         }), view.addEventListener("change", function() {
             hasChanges = !0
         }), view.addEventListener("viewbeforehide", function() {
-            hasChanges = !1, settingsInstance && settingsInstance.submit()
+            hasChanges = !1, settingsInstance && settingsInstance.submit();
+            document.body.classList.remove("hideBackgroundContainer");
+            document.querySelector(".backdropContainer").style.backgroundImage = null;
         }), view.addEventListener("viewdestroy", function() {
             settingsInstance && (settingsInstance.destroy(), settingsInstance = null)
         })

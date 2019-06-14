@@ -61,20 +61,34 @@ define(['events'], function (events) {
 
                 var paths = {};
                 paths[plugin.id] = plugin.baseUrl;
+                paths['@firebase/app'] = 'bower_components/firebase/firebase-app';
+                paths['@firebase/auth'] = 'bower_components/firebase/firebase-auth';
+                // paths['kendo-ui'] = 'bower_components/kendo-ui/js';
 
                 requirejs.config({
                     waitSeconds: 0,
                     paths: paths,
                     packages: [{
+                        name: 'moment-pt-BR',
+                        location: 'bower_components/moment/locale',
+                        main: 'pt-br'
+                    }, {
                         name: 'moment',
                         location: 'bower_components/moment',
                         main: 'moment'
+                    }, {
+                        name: 'vanilla-masker',
+                        location: 'bower_components/vanilla-masker/build',
+                        main: 'vanilla-masker.min'
+                    }, {
+                        name: 'bodymovin',
+                        location: 'bower_components/bodymovin/build/player',
+                        main: 'lottie.min'
+                    }, {
+                        name: 'fancygrid',
+                        location: 'bower_components/fancygrid/client',
+                        main: 'fancy.full.min'
                     }]
-                });
-
-                requirejs.config({
-                    waitSeconds: 0,
-                    paths: paths
                 });
 
                 instance.register(plugin);

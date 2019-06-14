@@ -302,6 +302,27 @@ define(["events", "appStorage"], function(events, appStorage) {
     }, ApiClient.prototype.isLoggedIn = function() {
         var info = this.serverInfo();
         return !!(info && info.UserId && info.AccessToken)
+    }, ApiClient.prototype.accountLogout = function() {
+        var instance = this;
+        return new Promise(function (resolve, reject) {
+            var done = function () {
+                appStorage.removeItem("account-" + instance.serverId());
+                resolve();
+            }.bind(this);
+
+            if (instance.accessToken()) {
+                var url = instance.getUrl("Sessions/Logout");
+                instance.ajax({
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify({
+                        IsAccount: true
+                    }),
+                    dataType: "json",
+                    contentType: "application/json"
+                }).then(done, done);
+            }
+        });
     }, ApiClient.prototype.logout = function() {
         stopBitrateDetection(this), this.closeWebSocket();
         var done = function() {
@@ -1265,6 +1286,118 @@ define(["events", "appStorage"], function(events, appStorage) {
             data: JSON.stringify(info),
             contentType: "application/json"
         })
+    }, ApiClient.prototype.emailIsVerified = function(uid) {
+        var url = "https://us-central1-neextv-4f242.cloudfunctions.net/emailIsVerified";
+        return this.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify({
+                uid: uid
+            }),
+            contentType: "application/json",
+            dataType: "json"
+        })
+    }, ApiClient.prototype.createAccount = function(verificationCode, phoneSessionId, email, password, accessCode) {
+        if (!email || !email.match(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/)) {
+            return Promise.reject("E-mail Inválido");
+        } else if (!password || password.length < 6) {
+            return Promise.reject("Senha inválida, são necessarios no mínimo 6 digitos");
+        } else if (!accessCode || accessCode.length !== 6) {
+            return Promise.reject("Invalid AccessCode");
+        } else {
+            var url = this.getUrl("Users/CreateAccount");
+            return this.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify({
+                    verificationCode: verificationCode,
+                    phoneSessionId: phoneSessionId,
+                    email: email,
+                    password: password,
+                    accessCode: accessCode
+                }),
+                contentType: "application/json",
+                dataType: "json"
+            })
+        }
+    }, ApiClient.prototype.getAccounts = function () {
+        var url = this.getUrl("Users/Accounts"),
+            instance = this;
+        return new window.Promise(function (resolve, reject) {
+            instance.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                contentType: "application/json"
+            }).then(function (result) {
+                resolve(result);
+            }, reject)
+        })
+    }, ApiClient.prototype.getAccount = function() {
+        return JSON.parse(appStorage.getItem("account-" + this.serverId()));
+    }, ApiClient.prototype.updateAccount = function (email, data) {
+        var url = this.getUrl("Users/Account/" + email),
+            instance = this;
+        return new window.Promise(function (resolve, reject) {
+            instance.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: "application/json"
+            }).then(function (result) {
+                resolve(result);
+            }, reject)
+        })
+    }, ApiClient.prototype.creditTransfer = function (email, amount) {
+        var url = this.getUrl("/Users/TransferAccountCredit");
+        return this.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify({
+                email: email,
+                amount: amount
+            }),
+            contentType: "application/json"
+        });
+    }, ApiClient.prototype.getAccountRequests = function () {
+        var url = this.getUrl("Users/AccountRequests"),
+            instance = this;
+        return new window.Promise(function (resolve, reject) {
+            instance.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                contentType: "application/json"
+            }).then(function (result) {
+                resolve(result);
+            }, reject)
+        })
+    }, ApiClient.prototype.createAccountRequest = function (plainId, groupId, reference) {
+        var url = this.getUrl("Users/CreateAccountRequest"),
+            instance = this;
+        return new window.Promise(function (resolve, reject) {
+            instance.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify({
+                    plainId: plainId,
+                    groupId: groupId,
+                    Reference: reference
+                }),
+                dataType: "json",
+                contentType: "application/json"
+            }).then(function (result) {
+                resolve(result);
+            }, reject)
+        })
+    }, ApiClient.prototype.deleteAccountRequest = function(accessCode) {
+        if (!accessCode) throw new Error("null id");
+        var url = this.getUrl("Users/AccountRequest/" + accessCode);
+        return this.ajax({
+            type: "DELETE",
+            url: url
+        })
     }, ApiClient.prototype.createUser = function(name) {
         var account = JSON.parse(appStorage.getItem("account-" + this.serverId()));
 
@@ -1277,10 +1410,11 @@ define(["events", "appStorage"], function(events, appStorage) {
             return this.ajax({
                 type: "POST",
                 url: url,
-                data: {
+                data: JSON.stringify({
                     Name: name,
                     AccessToken: account.AccessToken,
-                },
+                }),
+                contentType: "application/json",
                 dataType: "json"
             })
         }

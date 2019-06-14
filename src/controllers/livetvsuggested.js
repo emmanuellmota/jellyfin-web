@@ -183,7 +183,7 @@ define(["layoutManager", "userSettings", "inputManager", "loading", "globalize",
         if (userSettings.get("landing-" + folderId) === "guide") {
             return 1;
         }
-        return 0;
+        return 2;
     }
 
     return function (view, params) {

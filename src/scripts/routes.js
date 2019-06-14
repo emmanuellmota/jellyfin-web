@@ -196,6 +196,13 @@ define([
         controller: "loginpage"
     });
     defineRoute({
+        path: "/createaccount.html",
+        autoFocus: false,
+        anonymous: true,
+        startup: true,
+        controller: "createaccount"
+    });
+    defineRoute({
         path: "/metadataadvanced.html",
         autoFocus: false,
         roles: "admin"
@@ -223,6 +230,12 @@ define([
         transition: "fade"
     });
     defineRoute({
+        path: "/myaccount.html",
+        autoFocus: false,
+        transition: "fade",
+        controller: "myaccount"
+    });
+    defineRoute({
         path: "/mypreferencesdisplay.html",
         autoFocus: false,
         transition: "fade",
@@ -245,8 +258,7 @@ define([
         path: "/mypreferenceslanguages.html",
         autoFocus: false,
         transition: "fade",
-        controller: "mypreferenceslanguages",
-        roles: "admin"
+        controller: "mypreferenceslanguages"
     });
     defineRoute({
         path: "/mypreferencesmenu.html",
@@ -296,6 +308,14 @@ define([
         autoFocus: false,
         roles: "admin",
         controller: "installedplugins"
+    });
+    defineRoute({
+        path: "/reseller.html",
+        roles: "admin",
+        transition: "fade",
+        anonymous: true,
+        needAccount: "reseller",
+        controller: "reseller"
     });
     defineRoute({
         path: "/scheduledtask.html",

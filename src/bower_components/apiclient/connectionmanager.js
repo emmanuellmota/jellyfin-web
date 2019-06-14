@@ -208,6 +208,18 @@ define(["events", "apiclient", "appStorage"], function(events, apiClientFactory,
                 }
             }
 
+            function accountLogoutOfServer(apiClient) {
+                var serverInfo = apiClient.serverInfo() || {},
+                    logoutInfo = {
+                        serverId: serverInfo.Id
+                    };
+                return apiClient.accountLogout().then(function() {
+                    events.trigger(self, "accountsignedout", [logoutInfo])
+                }, function() {
+                    events.trigger(self, "accountsignedout", [logoutInfo])
+                })
+            }
+
             function logoutOfServer(apiClient) {
                 var serverInfo = apiClient.serverInfo() || {},
                     logoutInfo = {
@@ -468,6 +480,13 @@ define(["events", "apiclient", "appStorage"], function(events, apiClientFactory,
                     var localUser, credentials = credentialProvider.credentials();
                     !credentials.ConnectUserId || !credentials.ConnectAccessToken || apiClient && apiClient.getCurrentUserId() ? onEnsureConnectUserDone() : ensureConnectUser(credentials).then(onEnsureConnectUserDone, onEnsureConnectUserDone)
                 })
+            }, self.accountLogout = function() {
+                console.log("begin connectionManager accountLoguot");
+                for (var promises = [], i = 0, length = self._apiClients.length; i < length; i++) {
+                    var apiClient = self._apiClients[i];
+                    apiClient.accessToken() && promises.push(accountLogoutOfServer(apiClient))
+                }
+                return Promise.all(promises).then(self.logout)
             }, self.logout = function() {
                 console.log("begin connectionManager loguot");
                 for (var promises = [], i = 0, length = self._apiClients.length; i < length; i++) {

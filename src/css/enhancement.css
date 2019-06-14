@@ -44,10 +44,6 @@ html {
     font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-body.hideMainDrawer:not([class*="Document"]) .backdropContainer {
-    background-image: url(/web/img/movies_wall.jpg);
-}
-
 .emby-button {
     transition: all .3s;
 }
@@ -62,6 +58,7 @@ body.hideMainDrawer:not([class*="Document"]) .backdropContainer {
 
 *:focus {
     transform: perspective(1px) scale(1.048) !important;
+    color: #fff;
 }
 
 .scrollFrameY > .scrollSlider {
@@ -85,9 +82,30 @@ body[class*="Document"] .backdropContainer {
     background-image: linear-gradient(15deg, #060608 0%, #274359 45%, #162633 70%, #060608 99%, #060608 100%);
 }
 
-.libraryDocument .backgroundContainer:not(.withBackdrop) {
+.libraryDocument:not(.hideBackgroundContainer) .backgroundContainer:not(.withBackdrop) {
     background-color: transparent;
 }
+
+/* TODO: Remove */
+
+.libraryDocument:not(.hideBackgroundContainer) .skinHeader:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-color: #313131 !important;
+    background-image: linear-gradient(15deg, #060608 0%, #274359 45%, #162633 70%, #060608 99%, #060608 100%);
+}
+
+.libraryDocument.hideBackgroundContainer .skinHeader {
+    background: #101010 !important;
+    transition: all 1s !important;
+}
+
+/* END REMOVE */
 
 .backgroundContainer {
     transition: background .75s;
@@ -131,17 +149,19 @@ body[class*="Document"] .backdropContainer {
     display: flex;
 }
 
-#loginPage > *, #forgotPasswordPage > * {
+#loginPage > *, #forgotPasswordPage > *, #createAccountPage > * {
     position: relative;
-    margin: 0 auto;
+    margin-right: auto;
+    margin-left: auto;
     width: 90%;
     max-width: 40em;
+    min-height: 100%;
     display: flex;
     justify-content: center;
     flex-direction: column;
 }
 
-#loginPage .manualLoginForm, #forgotPasswordPage .forgotPasswordForm {
+#loginPage .manualLoginForm, #forgotPasswordPage .forgotPasswordForm, #createAccountPage .createAccountForm {
     padding: 32px;
     border-radius: 4px;
     background-color: #000;
@@ -459,6 +479,219 @@ body[class*="Document"] .backdropContainer {
 }
 
 .headerHomeButton {
+    display: none;
+}
+
+/* ReCaptcha*/
+body > div:last-child:not([class])[style] {
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: none !important;
+}
+body > div:last-child:not([class])[style] * {
+    transition: none !important;
+}
+body > div:last-child:not([class])[style] > div:first-child {
+    background-color: rgb(0, 0, 0) !important;
+}
+body > div:last-child:not([class])[style] > div:last-child {
+    position: unset !important;
+}
+
+.createAccountForm .scrollSlider > section {
+    margin-bottom: 0;
+    height: 0;
+    transition: all .3s;
+    text-align: center;
+    overflow: hidden;
+}
+
+.createAccountForm .scrollSlider > section > div {
+    display: flex;
+    overflow: hidden;
+}
+
+.createAccountForm.validating .scrollSlider > section .loader {
+    max-width: 50px;
+    max-height: 50px;
+    width: 100%;
+    height: 100%;
+    transform: scale(4);
+    transition: all .3s;
+}
+
+.createAccountForm.validating .scrollSlider > section .loader {
+    max-width: 50px;
+    max-height: 50px;
+    width: 100%;
+    height: 100%;
+    transform: scale(4);
+    transition: all .3s;
+}
+
+.createAccountForm.validating .scrollSlider > section .loader.collapsed {
+    max-width: 0;
+    opacity: 0;
+}
+
+.createAccountForm.validating .scrollSlider > section svg {
+    width: 50px !important;
+    height: 50px !important;
+}
+
+.createAccountForm .scrollSlider > section.expanded:first-of-type {
+    height: 4.006em;
+    margin-bottom: 1.8em;
+}
+
+.createAccountForm.validating .scrollSlider > section:last-of-type {
+    height: 12.211em;
+    margin: -1em;
+    padding: 1em;
+}
+
+.createAccountForm .inputContainer {
+    transition: all .3s;
+    height: 4.325em;
+}
+
+.createAccountForm a {
+    color: #fff;
+}
+
+.createAccountForm a:focus {
+    color: #32c1e3;
+    outline: none !important;
+}
+
+.createAccountForm.validating .scrollSlider > div:nth-child(7) {
+    margin-bottom: 0;
+}
+
+.createAccountForm.validating .scrollSlider > :not(.keep) {
+    overflow: hidden;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.grecaptcha-badge {
+    box-shadow: none !important;
+}
+
+.createAccountForm.validating #recaptcha {
+    display: none;
+}
+
+.accountPage {
+    font-weight: 200;
+}
+
+.plainsContainer {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-column-gap: 10px;
+    text-align: center;
+}
+
+.plainsContainer > div {
+    position: relative;
+    border: solid 3px rgba(255, 255, 255, .1);
+    border-radius: 3px;
+    padding: 1.2em 1em 1.7em;
+    cursor: default;
+}
+
+.plainsContainer > div.current {
+    border: solid 3px #2495bd;
+}
+
+.plainsContainer > div.current:before {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 50%;
+    width: 1.3em;
+    transform: translate(-50%, -50%);
+    content: "\e5ca";
+    font-size: 1.6em;
+    font-weight: bold;
+    font-family: 'Material Icons', serif;
+    color: #101010;
+    background: #2495bd;
+    border-radius: 50%;
+    line-height: 1.3em;
+}
+
+.plainsContainer > div > h3 {
+    margin: 0 0 1em 0;
+}
+
+.fancy-grid-body > div:not([class]) {
+    display: none;
+}
+
+.resellerPage .fancy .fancy-panel-header {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.resellerPage .fancy .fancy-panel-header-text {
+    font-weight: 500;
+    font-size: 1.5em;
+    margin-top: -.5em;
+    text-align: left;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", 'Open Sans', sans-serif;
+}
+
+.resellerPage #fancygrid > .fancy-panel > div.fancy-panel-header > div.fancy-panel-header-tools > div:nth-child(1) {
+    cursor: default;
+    color: #C7D7E9 !important;
+}
+
+.column-cls-unmargin .fancy-grid-cell-inner {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.column-cls-flex .fancy-grid-column-action-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fancy-grid .buttom-column {
+    padding: 4px 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: all .3s;
+    cursor: pointer;
+}
+
+.fancy-grid .buttom-column:hover {
+    background: #5a5a5a;
+    border: 1px solid #5a5a5a;
+    color: #ccc;
+}
+
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.fancy-grid-cell-dirty-el {
     display: none;
 }
 

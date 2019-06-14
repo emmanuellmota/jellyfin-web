@@ -1,0 +1,38 @@
+<div class="formDialogHeader">
+    <button is="paper-icon-button-light" class="btnCancel autoSize" tabindex="-1"><i class="md-icon">&#xE5C4;</i></button>
+    <h3 class="formDialogHeaderTitle">
+        Adicionar novo cliente
+    </h3>
+</div>
+
+<div class="formDialogContent smoothScrollY">
+    <div class="dialogContentInner dialog-content-centered">
+        <form class="popupAccountRequestForm" style="margin:auto;">
+
+            <p>A adição de novos clientes funciona apenas por meio de convites, portanto preencha os dados abaixo para que seja gerado um código de acesso, e um endereço no qual o cliente poderá realizar seu cadastro.</p>
+            <div class="inputContainer">
+                <input required is="emby-input" type="text" id="txtReference" data-lookup="Reference" label="Identificador" autocomplete="off" />
+                <div class="fieldDescription">O identificador irá lhe auxiliar a localizar o convite na tabela de convites, portanto, atribua um nome de fácil indentificaçao, por exemplo: "Convite de John Locke".<br /> PS. Este campo só é visível por você.</div>
+            </div>
+            <div class="inputContainer" style="position: relative;">
+                <select is="emby-select" id="selectGroupId" name="selectGroupId" label="Tipo de Conta">
+                    <option value="1">Cliente</option>
+                    <option value="3">Revendedor</option>
+                </select>
+            </div>
+            <div class="inputContainer" style="position: relative;">
+                <select is="emby-select" id="selectPlainId" name="selectPlainId" label="Plano">
+                    <option value="1">Básico</option>
+                    <option value="2">Padrão</option>
+                    <option value="3">Premium</option>
+                </select>
+            </div>
+
+            <div class="formDialogFooter">
+                <button is="emby-button" type="submit" class="raised button-submit block formDialogFooterItem">
+                    <span>Criar</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

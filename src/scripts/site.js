@@ -1,3 +1,10 @@
+function makeFocusable(el, isAllowed) {
+    if (!el) return;
+
+    el[!isAllowed ? "setAttribute" : "removeAttribute"]("tabindex", -1);
+    el[!isAllowed ? "setAttribute" : "removeAttribute"]("focusable", false);
+}
+
 function getWindowLocationSearch(win) {
     "use strict";
 
@@ -83,7 +90,7 @@ function pageIdOn(eventName, id, fn) {
 }
 
 function makeBlurredCopy() {
-    if (Emby.Page.current().anonymous) return false;
+    if (!Emby.Page.current() || Emby.Page.current().anonymous || Emby.Page.current().startup) return false;
 
     var backdropContainer = document.querySelector(".backdropContainer").cloneNode(true);
     var backgroundContainer = document.querySelector(".backgroundContainer").cloneNode(true);
@@ -180,6 +187,22 @@ var Dashboard = {
             }
 
             Dashboard.navigate(loginPage);
+        });
+    },
+    accountLogout: function () {
+        ConnectionManager.accountLogout().then(function () {
+            ConnectionManager.logout().then(function () {
+                var loginPage;
+
+                if (AppInfo.isNativeApp) {
+                    loginPage = "selectserver.html";
+                    window.ApiClient = null;
+                } else {
+                    loginPage = "login.html";
+                }
+
+                Dashboard.navigate(loginPage);
+            });
         });
     },
     getConfigurationPageUrl: function (name) {
@@ -831,6 +854,7 @@ var AppInfo = {};
         define("recordingHelper", [componentsPath + "/recordingcreator/recordinghelper"], returnFirstDependency);
         define("subtitleEditor", [componentsPath + "/subtitleeditor/subtitleeditor"], returnFirstDependency);
         define("itemIdentifier", [componentsPath + "/itemidentifier/itemidentifier"], returnFirstDependency);
+        define("accountRequest", [componentsPath + "/accountrequest/accountrequest"], returnFirstDependency);
         define("mediaInfo", [componentsPath + "/mediainfo/mediainfo"], returnFirstDependency);
         define("itemContextMenu", [componentsPath + "/itemcontextmenu"], returnFirstDependency);
         define("imageEditor", [componentsPath + "/imageeditor/imageeditor"], returnFirstDependency);

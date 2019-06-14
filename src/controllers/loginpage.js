@@ -1,4 +1,4 @@
-define(["moment", "appSettings", "dom", "connectionManager", "loading", "focusManager", "emby-scroller", "cardStyle", "emby-checkbox"], function (moment, appSettings, dom, connectionManager, loading, focusManager) {
+define(["moment", "appSettings", "dom", "connectionManager", "loading", "focusManager", "emby-scroller", "cardStyle", "emby-checkbox", "moment-pt-BR"], function (moment, appSettings, dom, connectionManager, loading, focusManager) {
     "use strict";
     var token = null;
 
@@ -34,6 +34,7 @@ define(["moment", "appSettings", "dom", "connectionManager", "loading", "focusMa
     function showManualForm(context, focusPassword) {
         var bg = new Image();
         bg.onload = function () {
+            document.querySelector(".backdropContainer").style.backgroundImage = 'url("' + bg.src + '")';
             document.querySelector(".backgroundContainer").style.backgroundColor = "rgba(0, 0, 0, .75)";
         }
         bg.src = "/web/img/movies_wall.jpg";
@@ -167,6 +168,8 @@ define(["moment", "appSettings", "dom", "connectionManager", "loading", "focusMa
             apiClient.getJSON(apiClient.getUrl("Branding/Configuration")).then(function(options) {
                 view.querySelector(".disclaimer").textContent = options.LoginDisclaimer || ""
             });
+        }), view.addEventListener("viewbeforehide", function () {
+            document.querySelector(".backdropContainer").style.backgroundImage = null;
         });
     }
 });
